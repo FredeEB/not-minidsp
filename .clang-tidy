@@ -1,0 +1,1 @@
+Checks: "bugprone-*,modernize-*,-modernize-use-trailing-return-type,cppcoreguidelines-*,-cppcoreguidelines-avoid-magic-numbers"
