@@ -6,11 +6,18 @@
 #include <portaudio.h>
 #include <array>
 #include <portaudiocpp/Stream.hxx>
+#include <istream>
 #include <utility>
 
 namespace Audio {
 
-template <typename T, std::size_t FramesPerBuffer = 64, std::size_t Channels = 1>
+template <typename T, std::size_t FramesPerBuffer>
+class Biquad;
+
+template <typename T, std::size_t FramesPerBuffer>
+std::istream& operator>>(std::istream&, Biquad<T, FramesPerBuffer>&);
+
+template <typename T, std::size_t FramesPerBuffer>
 class Biquad {
 public:
     using value_type = T;
@@ -30,10 +37,17 @@ public:
         }
     }
 
+    friend std::istream& operator>><T, FramesPerBuffer>(std::istream&, Biquad&);
+
 private:
     value_type a1{}, a2{}, b0{}, b1{}, b2{};
     value_type yn1{}, yn2{}, xn0{}, xn1{}, xn2{};
 };
+
+template <typename T, std::size_t FramesPerBuffer>
+std::istream& operator>>(std::istream& is, Biquad<T, FramesPerBuffer>& c) {
+    return is >> c.b0 >> c.b1 >> c.b1 >> c.a1 >> c.a2;
+}
 
 } // namespace Audio
 
