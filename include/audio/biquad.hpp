@@ -21,8 +21,8 @@ template <typename T, std::size_t FramesPerBuffer>
 class Biquad {
 public:
     using value_type = T;
-    Biquad() = default;
-    Biquad(value_type ca1, value_type ca2, value_type cb0, value_type cb1, value_type cb2)
+    constexpr Biquad() = default;
+    constexpr Biquad(value_type ca1, value_type ca2, value_type cb0, value_type cb1, value_type cb2)
             : a1{ca1}, a2{ca2}, b0{cb0}, b1{cb1}, b2{cb2} {}
     void process(std::array<value_type, FramesPerBuffer>& buffer) {
         for (auto i = 0; i < FramesPerBuffer; ++i) {
