@@ -4,6 +4,9 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <fstream>
+#include <istream>
+#include <iterator>
 #include <utility>
 #include <vector>
 
@@ -27,6 +30,12 @@ public:
 
     void registerFilter(Filter_type&& filter) { filters.push_back(std::forward<decltype(filter)>(filter)); }
     void unregisterFilter(std::size_t index) { filters.erase(index); }
+
+    void loadFiltersFromFile(std::string const& path) {
+        std::ifstream file(path);
+        std::istream_iterator<Filter_type> begin(file), end;
+        std::copy(begin, end, std::back_inserter(filters));
+    }
 
 private:
     std::vector<Filter_type> filters;
