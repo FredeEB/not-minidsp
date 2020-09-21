@@ -22,23 +22,23 @@ template <typename T, std::size_t FramesPerBuffer = 64, std::size_t Channels = 2
 class RoomCorrection {
 public:
     using value_type = T;
-    using Filter_type = Biquad<value_type, FramesPerBuffer, Channels>;
+    using filter_type = Biquad<value_type, FramesPerBuffer>;
 
     void process(std::array<value_type, FramesPerBuffer>& buffer) {
         for (auto& filter : filters) filter.process(buffer);
     }
 
-    void registerFilter(Filter_type&& filter) { filters.push_back(std::forward<decltype(filter)>(filter)); }
+    void registerFilter(filter_type&& filter) { filters.push_back(std::forward<decltype(filter)>(filter)); }
     void unregisterFilter(std::size_t index) { filters.erase(index); }
 
     void loadFiltersFromFile(std::string const& path) {
         std::ifstream file(path);
-        std::istream_iterator<Filter_type> begin(file), end;
+        std::istream_iterator<filter_type> begin(file), end;
         std::copy(begin, end, std::back_inserter(filters));
     }
 
 private:
-    std::vector<Filter_type> filters;
+    std::vector<filter_type> filters;
 };
 
 } // namespace Audio
