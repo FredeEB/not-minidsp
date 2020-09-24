@@ -18,27 +18,28 @@
 
 namespace Audio {
 
-template <typename T, std::size_t FramesPerBuffer = 64, std::size_t Channels = 2>
+template <typename BufferType, std::size_t Channels>
 class RoomCorrection {
 public:
-    using value_type = T;
-    using Filter_type = Biquad<value_type, FramesPerBuffer, Channels>;
+    using value_type = typename BufferType::value_type;
+    using buffer_type = BufferType;
+    using filter_type = Biquad<buffer_type>;
 
-    void process(std::array<value_type, FramesPerBuffer>& buffer) {
+    void process(buffer_type& buffer) {
         for (auto& filter : filters) filter.process(buffer);
     }
 
-    void registerFilter(Filter_type&& filter) { filters.push_back(std::forward<decltype(filter)>(filter)); }
+    void registerFilter(filter_type&& filter) { filters.push_back(std::forward<decltype(filter)>(filter)); }
     void unregisterFilter(std::size_t index) { filters.erase(index); }
 
     void loadFiltersFromFile(std::string const& path) {
         std::ifstream file(path);
-        std::istream_iterator<Filter_type> begin(file), end;
+        std::istream_iterator<filter_type> begin(file), end;
         std::copy(begin, end, std::back_inserter(filters));
     }
 
 private:
-    std::vector<Filter_type> filters;
+    std::vector<filter_type> filters;
 };
 
 } // namespace Audio

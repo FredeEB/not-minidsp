@@ -2,58 +2,73 @@
 #define AUDIOPROCESSOR_H
 
 #include <bits/c++config.h>
-#include <fmt/os.h>
+#include <fmt/core.h>
+#include <portaudio.h>
+#include <algorithm>
+#include <array>
 #include <memory>
 #include <portaudiocpp/Device.hxx>
-#include <portaudiocpp/SampleDataFormat.hxx>
 #include <portaudiocpp/System.hxx>
-#include <portaudiocpp/Stream.hxx>
 #include <portaudiocpp/StreamParameters.hxx>
 #include <portaudiocpp/DirectionSpecificStreamParameters.hxx>
 #include <portaudiocpp/BlockingStream.hxx>
+#include <stdexcept>
 #include <util/config.hpp>
+#include <util/numbertype.hpp>
 #include <util/singleton.hpp>
+#include <audio/audiostream.hpp>
 #include <thread>
 
 namespace Audio {
-
-template <typename Algorithm, std::size_t FramesPerBuffer = 64, std::size_t Channels = 2>
+template <template <typename BufferType, std::size_t Channels> typename Algorithm,
+          typename BufferType = std::array<float, 512>, std::size_t Channels = 2>
 class AudioProcessor {
 public:
-    using value_type = typename Algorithm::value_type;
+    using value_type = typename BufferType::value_type;
+    using algorithm_type = Algorithm<BufferType, Channels>;
+    using buffer_type = BufferType;
+
+    AudioProcessor() {
+        auto err = Pa_Initialize();
+        if (err != paNoError) throw std::runtime_error("Failed to initialize Portaudio");
+    }
+    ~AudioProcessor() { Pa_Terminate(); }
 
     void run() {
-        auto& sys = portaudio::System::instance();
-        auto& config = Util::Singleton<Util::Config>();
-        portaudio::DirectionSpecificStreamParameters inputparams(
-                sys.deviceByIndex(config.deviceIndex), Channels, portaudio::INT24, false,
-                sys.defaultInputDevice().defaultLowInputLatency(), nullptr);
-        portaudio::DirectionSpecificStreamParameters outputparams(
-                sys.deviceByIndex(config.deviceIndex), Channels, portaudio::INT24, false,
-                sys.defaultOutputDevice().defaultLowOutputLatency(), nullptr);
-
-        portaudio::StreamParameters params(inputparams, outputparams, config.SampleRate, FramesPerBuffer, paClipOff);
-        stream.open(params);
-        process = std::thread([this] {
-            stream.start();
-            running = true;
-            while (running) {
-                stream.read(static_cast<void*>(buffer.data()), buffer.size());
-                algorithm.process(buffer);
-                stream.write(static_cast<void*>(buffer.data()), buffer.size());
-            }
-            stream.stop();
-        });
+        auto err =
+                Pa_OpenDefaultStream(&stream, Channels, Channels, Util::NumberType<value_type>::value,
+                                     Util::Singleton<Util::Config>().SampleRate, buffer.size(), StreamCallback, this);
+        if (err != paNoError) throw std::runtime_error("Failed to open stream");
+        fmt::print("Opened stream\n");
+        Pa_StartStream(stream);
     }
 
-    void stop() { running = false; }
+    void stop() {
+        Pa_StopStream(stream);
+        Pa_CloseStream(stream);
+    }
 
-    Algorithm& algo() { return algorithm; }
+    algorithm_type& algo() { return algorithm; }
 
 private:
-    std::array<value_type, FramesPerBuffer> buffer;
-    portaudio::BlockingStream stream;
-    Algorithm algorithm;
+    static int StreamCallback(const void* input, void* output, unsigned long frameCount,
+                              const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* object) {
+        auto self = static_cast<AudioProcessor*>(object);
+        auto inbuffer = static_cast<value_type const*>(input);
+        auto outbuffer = static_cast<value_type*>(output);
+        for (std::size_t i = 0; i < frameCount; ++i) {
+            self->buffer[i] = inbuffer[i];
+        }
+        self->algorithm.process(self->buffer);
+        for (std::size_t i = 0; i < frameCount; ++i) {
+            outbuffer[i] = self->buffer[i];
+        }
+        return paContinue;
+    }
+
+    buffer_type buffer;
+    PaStream* stream{};
+    algorithm_type algorithm;
     std::thread process;
     bool running{false};
 };

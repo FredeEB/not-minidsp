@@ -9,32 +9,31 @@
 
 namespace Audio {
 
-template <int Channels = 1, std::size_t Size = 256>
+template <typename BufferType, std::size_t Channels>
 class Sine {
 public:
-    int generate(void const *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
-                 PaStreamCallbackTimeInfo const *, PaStreamCallbackFlags) {
-        assert(inputBuffer != nullptr);
+    using value_type = typename BufferType::value_type;
+    using buffer_type = BufferType;
 
-        auto out = static_cast<float **>(outputBuffer);
-
-        for (auto channel = 0; channel < Channels; ++channel) {
-            for (auto i = 0; i < framesPerBuffer; ++i) {
-                out[channel][i] = table[phase[channel]++];
-                if (phase[channel] > Size) {
-                    phase[channel] -= Size;
-                }
+    void process(buffer_type& buffer) {
+        for (auto& sample : buffer) {
+            sample = table[phase++];
+            if (phase > Size) {
+                phase -= Size;
             }
         }
-        return paContinue;
     }
 
 private:
-    std::array<int, Channels> phase;
+    int phase;
 
-    static constexpr double PI2_DIV_SIZE = []() { return (M_PI * 2) / (Size * 4); }();
-    static constexpr double sine(std::size_t index) { return 1 * std::sin(PI2_DIV_SIZE * static_cast<double>(index)); }
-    static constexpr std::array<double, Size> table = generate_table<double, Size>(&Sine::sine);
+    static constexpr auto Size = 1024;
+
+    static constexpr value_type PI2_DIV_SIZE = []() { return (M_PI * 2) / (Size * 4); }();
+    static constexpr value_type sine(std::size_t index) {
+        return 1 * std::sin(PI2_DIV_SIZE * static_cast<value_type>(index));
+    }
+    static constexpr std::array<value_type, Size> table = generate_table<value_type, Size>(&Sine::sine);
 };
 
 } // namespace Audio
