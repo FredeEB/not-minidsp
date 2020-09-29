@@ -1,23 +1,17 @@
 #ifndef AUDIOPROCESSOR_H
 #define AUDIOPROCESSOR_H
 
-#include <bits/c++config.h>
-#include <fmt/core.h>
-#include <portaudio.h>
 #include <algorithm>
 #include <array>
 #include <memory>
-#include <portaudiocpp/Device.hxx>
-#include <portaudiocpp/System.hxx>
-#include <portaudiocpp/StreamParameters.hxx>
-#include <portaudiocpp/DirectionSpecificStreamParameters.hxx>
-#include <portaudiocpp/BlockingStream.hxx>
 #include <stdexcept>
+#include <thread>
+
 #include <util/config.hpp>
 #include <util/numbertype.hpp>
 #include <util/singleton.hpp>
-#include <audio/audiostream.hpp>
-#include <thread>
+
+#include <portaudio.h>
 
 namespace Audio {
 template <template <typename BufferType, std::size_t Channels> typename Algorithm,
@@ -39,7 +33,6 @@ public:
                 Pa_OpenDefaultStream(&stream, Channels, Channels, Util::NumberType<value_type>::value,
                                      Util::Singleton<Util::Config>().SampleRate, buffer.size(), StreamCallback, this);
         if (err != paNoError) throw std::runtime_error("Failed to open stream");
-        fmt::print("Opened stream\n");
         Pa_StartStream(stream);
     }
 

@@ -1,8 +1,6 @@
 #ifndef BIQUAD_H
 #define BIQUAD_H
 
-#include <cmath>
-#include <portaudio.h>
 #include <array>
 #include <istream>
 #include <utility>
