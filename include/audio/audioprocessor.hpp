@@ -26,7 +26,10 @@ public:
         auto err = Pa_Initialize();
         if (err != paNoError) throw std::runtime_error("Failed to initialize Portaudio");
     }
-    ~AudioProcessor() { Pa_Terminate(); }
+    ~AudioProcessor() noexcept {
+        stop();
+        Pa_Terminate();
+    }
 
     void run() {
         auto err =
@@ -36,7 +39,7 @@ public:
         Pa_StartStream(stream);
     }
 
-    void stop() {
+    void stop() noexcept {
         Pa_StopStream(stream);
         Pa_CloseStream(stream);
     }
