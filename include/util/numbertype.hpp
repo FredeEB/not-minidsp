@@ -1,7 +1,7 @@
 #ifndef NUMBERTYPE_H
 #define NUMBERTYPE_H
 
-#include <portaudiocpp/SampleDataFormat.hxx>
+#include <portaudio.h>
 #include <type_traits>
 
 namespace Util {
@@ -13,22 +13,22 @@ struct NumberType {
 
 template <>
 struct NumberType<char> {
-    static portaudio::SampleDataFormat const value{portaudio::INT8};
+    static PaSampleFormat const value{paInt8};
 };
 
 template <>
 struct NumberType<short> {
-    static portaudio::SampleDataFormat const value{portaudio::INT16};
+    static PaSampleFormat const value{paInt16};
 };
 
 template <>
 struct NumberType<int> {
-    static portaudio::SampleDataFormat const value{portaudio::INT24};
+    static PaSampleFormat const value{paInt24};
 };
 
 template <>
 struct NumberType<float> {
-    static portaudio::SampleDataFormat const value{portaudio::FLOAT32};
+    static PaSampleFormat const value{paFloat32};
 };
 
 } // namespace Util

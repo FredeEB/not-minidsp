@@ -1,18 +1,11 @@
 #ifndef ROOMCORRECTION_H
 #define ROOMCORRECTION_H
 
-#include <array>
-#include <cassert>
 #include <cstdint>
 #include <fstream>
-#include <istream>
 #include <iterator>
 #include <utility>
 #include <vector>
-
-#include <bits/c++config.h>
-#include <portaudio.h>
-#include <portaudiocpp/Stream.hxx>
 
 #include <audio/biquad.hpp>
 

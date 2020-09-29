@@ -14,10 +14,11 @@ target_compile_options(
 )
 
 add_subdirectory(src)
+add_subdirectory(deps)
 
 find_package(Threads REQUIRED)
-find_package(fmt)
-target_link_libraries(prog PUBLIC Threads::Threads portaudiocpp portaudio fmt)
+
+target_link_libraries(prog PUBLIC Threads::Threads portaudio fmt)
 
 ### RUN BINARY TARGET (make run)
 add_custom_target(

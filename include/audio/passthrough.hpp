@@ -1,10 +1,7 @@
 #ifndef PASSTHROUGH_H
 #define PASSTHROUGH_H
 
-#include <portaudio.h>
-#include <boost/circular_buffer.hpp>
-#include <portaudiocpp/Stream.hxx>
-#include <utility>
+#include <cstdint>
 
 namespace Audio {
 
