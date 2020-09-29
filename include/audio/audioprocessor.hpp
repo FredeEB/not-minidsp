@@ -14,12 +14,12 @@
 #include <portaudio.h>
 
 namespace Audio {
-template <template <typename BufferType, std::size_t Channels> typename Algorithm,
+template <template <typename BufferType, std::size_t Channels, typename... Tag> typename Algorithm, typename Tag,
           typename BufferType = std::array<float, 512>, std::size_t Channels = 2>
 class AudioProcessor {
 public:
     using value_type = typename BufferType::value_type;
-    using algorithm_type = Algorithm<BufferType, Channels>;
+    using algorithm_type = Algorithm<BufferType, Channels, Tag>;
     using buffer_type = BufferType;
 
     AudioProcessor() {

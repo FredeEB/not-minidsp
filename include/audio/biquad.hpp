@@ -5,23 +5,28 @@
 #include <istream>
 #include <utility>
 
+#include <audio/filter.hpp>
+
 namespace Audio {
 
+struct BiquadTag {};
+
 template <typename BufferType>
-class Biquad;
+using Biquad = Filter<BufferType, BiquadTag>;
 
 template <typename BufferType>
 std::istream& operator>>(std::istream&, Biquad<BufferType>&);
 
 template <typename BufferType>
-class Biquad {
+class Filter<BufferType, BiquadTag> {
 public:
     using buffer_type = BufferType;
-    using value_type = typename BufferType::value_type;
+    using value_type = typename buffer_type::value_type;
 
-    constexpr Biquad() = default;
-    constexpr Biquad(value_type ca1, value_type ca2, value_type cb0, value_type cb1, value_type cb2)
+    constexpr Filter() = default;
+    constexpr Filter(value_type ca1, value_type ca2, value_type cb0, value_type cb1, value_type cb2)
             : a1{ca1}, a2{ca2}, b0{cb0}, b1{cb1}, b2{cb2} {}
+
     void process(buffer_type& buffer) {
         for (std::size_t i = 0; i < buffer.size(); ++i) {
             xn2 = xn1;
@@ -35,7 +40,7 @@ public:
         }
     }
 
-    friend std::istream& operator>><buffer_type>(std::istream&, Biquad&);
+    friend std::istream& operator>><buffer_type>(std::istream&, Filter&);
 
 private:
     // TODO: Should coefficients always be doubles, or should they be scaled at construction time if integral?
