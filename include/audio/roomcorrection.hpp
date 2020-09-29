@@ -11,8 +11,11 @@
 
 namespace Audio {
 
+template <typename BufferType, std::size_t Channels, typename Tag = void>
+class RoomCorrection;
+
 template <typename BufferType, std::size_t Channels>
-class RoomCorrection {
+class RoomCorrection<BufferType, Channels, BiquadTag> {
 public:
     using value_type = typename BufferType::value_type;
     using buffer_type = BufferType;
