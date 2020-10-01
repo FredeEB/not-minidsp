@@ -14,9 +14,10 @@ target_compile_options(
 )
 
 add_subdirectory(src)
-add_subdirectory(deps)
+# add_subdirectory(deps)
 
 find_package(Threads REQUIRED)
+find_package(fmt REQUIRED)
 
 target_link_libraries(prog PUBLIC Threads::Threads portaudio fmt)
 
