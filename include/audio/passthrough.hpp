@@ -5,10 +5,11 @@
 
 namespace Audio {
 
-template <typename ValueType, std::size_t Channels = 1>
+template <typename BufferType, std::size_t Channels, typename = void>
 class Passthrough {
 public:
-    void process(boost::circular_buffer<ValueType>& buffer) {}
+    using buffer_type = BufferType;
+    void process(buffer_type&) {}
 };
 
 } // namespace Audio
