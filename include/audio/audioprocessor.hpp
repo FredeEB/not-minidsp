@@ -15,14 +15,15 @@
 
 namespace Audio {
 template <template <typename BufferType, std::size_t Channels, typename... Tag> typename Algorithm, typename Tag,
-          typename BufferType = std::array<float, 512>, std::size_t Channels = 2>
+          typename BufferType = std::array<float, 32>, std::size_t Channels = 1>
 class AudioProcessor {
 public:
     using value_type = typename BufferType::value_type;
     using algorithm_type = Algorithm<BufferType, Channels, Tag>;
     using buffer_type = BufferType;
 
-    AudioProcessor() {
+    template <typename... Args>
+    AudioProcessor(Args... args) : algorithm(args...) {
         auto err = Pa_Initialize();
         if (err != paNoError) throw std::runtime_error("Failed to initialize Portaudio");
     }
