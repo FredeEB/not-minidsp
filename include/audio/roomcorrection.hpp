@@ -26,7 +26,7 @@ public:
     }
 
     void registerFilter(filter_type&& filter) { filters.push_back(std::forward<decltype(filter)>(filter)); }
-    void unregisterFilter(std::size_t index) { filters.erase(index); }
+    void clearFilters() { filters.clear(); }
 
     void loadFiltersFromFile(std::string const& path) {
         std::ifstream file(path);
