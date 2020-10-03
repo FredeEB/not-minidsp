@@ -1,9 +1,11 @@
 #ifndef ROOMCORRECTION_H
 #define ROOMCORRECTION_H
 
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
 #include <iterator>
+#include <ostream>
 #include <utility>
 #include <vector>
 
@@ -33,6 +35,10 @@ public:
         std::ifstream file(path);
         std::istream_iterator<filter_type> begin(file), end;
         std::copy(begin, end, std::back_inserter(filters));
+    }
+
+    void printfilters(std::ostream& where) {
+        std::copy(filters.begin(), filters.end(), std::ostream_iterator<filter_type>(where, "\n"));
     }
 
 private:
