@@ -60,7 +60,7 @@ public:
 
     void process(buffer_type& buffer) { filter.process(buffer); }
 
-    void loadFiltersFromFile(std::string const& path) {
+    void loadFilterFromFile(std::string const& path) {
         std::ifstream file(path);
         file >> filter;
     }
