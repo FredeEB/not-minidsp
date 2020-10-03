@@ -27,7 +27,10 @@ public:
         auto err = Pa_Initialize();
         if (err != paNoError) throw std::runtime_error("Failed to initialize Portaudio");
     }
-    ~AudioProcessor() { Pa_Terminate(); }
+    ~AudioProcessor() noexcept {
+        stop();
+        Pa_Terminate();
+    }
 
     void run() {
         auto err =
@@ -37,16 +40,17 @@ public:
         Pa_StartStream(stream);
     }
 
-    void stop() {
+    inline void stop() noexcept {
         Pa_StopStream(stream);
         Pa_CloseStream(stream);
     }
 
-    algorithm_type& algo() { return algorithm; }
+    inline algorithm_type& algo() { return algorithm; }
 
 private:
-    static int StreamCallback(const void* input, void* output, unsigned long frameCount,
-                              const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* object) {
+    // Callback function for audiostream. Will call process on algorithm
+    inline static int StreamCallback(const void* input, void* output, unsigned long frameCount,
+                                     const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* object) {
         auto self = static_cast<AudioProcessor*>(object);
         auto inbuffer = static_cast<value_type const*>(input);
         auto outbuffer = static_cast<value_type*>(output);
