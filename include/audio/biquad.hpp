@@ -53,7 +53,8 @@ private:
 
 template <typename BufferType>
 std::istream& operator>>(std::istream& is, Biquad<BufferType>& c) {
-    return is >> c.b0 >> c.b1 >> c.b1 >> c.a1 >> c.a2;
+    return is >> c.a1 >> c.a2 >> c.b0 >> c.b1 >> c.b2;
+}
 template <typename BufferType>
 std::ostream& operator<<(std::ostream& os, Biquad<BufferType> const& filter) {
     os << "Biquad: "
