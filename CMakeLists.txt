@@ -19,7 +19,7 @@ add_subdirectory(src)
 find_package(Threads REQUIRED)
 find_package(fmt REQUIRED)
 
-target_link_libraries(prog PUBLIC Threads::Threads portaudio fmt)
+target_link_libraries(prog PUBLIC Threads::Threads portaudio fmt tbb)
 
 ### RUN BINARY TARGET (make run)
 add_custom_target(
