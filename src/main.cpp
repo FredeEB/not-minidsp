@@ -1,5 +1,7 @@
 #include <fmt/core.h>
 
+#include <chrono>
+#include <thread>
 #include <util/config.hpp>
 #include <util/singleton.hpp>
 #include <audio/audioprocessor.hpp>
@@ -7,14 +9,10 @@
 #include <audio/sine.hpp>
 #include <audio/biquad.hpp>
 
-using namespace std::literals::chrono_literals;
-
 int main() {
-    Audio::AudioProcessor<Audio::RoomCorrection, Audio::BiquadTag> processor;
+    Audio::AudioProcessor<Audio::RoomCorrection, Audio::FIRTag> processor(1024UL);
 
-    processor.algo().loadFiltersFromFile("filters.txt");
-    processor.algo().printfilters(std::cout);
-
+    processor.algo().loadFilterFromFile("filter.txt");
     processor.run();
     while (true) {
     }
