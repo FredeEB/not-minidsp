@@ -9,9 +9,6 @@
 
 using namespace std::literals::chrono_literals;
 
-static const std::size_t FramesPerBuffer = 512;
-static const std::size_t Channels = 2;
-
 int main() {
     Audio::AudioProcessor<Audio::RoomCorrection, Audio::BiquadTag> processor;
 

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <audio/biquad.hpp>
+#include <audio/fir.hpp>
 
 namespace Audio {
 
@@ -36,6 +37,26 @@ public:
 
 private:
     std::vector<filter_type> filters;
+};
+
+template <typename BufferType, std::size_t Channels>
+class RoomCorrection<BufferType, Channels, FIRTag> {
+public:
+    using value_type = typename BufferType::value_type;
+    using buffer_type = BufferType;
+    using filter_type = FIRFilter<buffer_type>;
+
+    constexpr RoomCorrection(std::size_t taps) : filter(taps) {}
+
+    void process(buffer_type& buffer) { filter.process(buffer); }
+
+    void loadFiltersFromFile(std::string const& path) {
+        std::ifstream file(path);
+        file >> filter;
+    }
+
+private:
+    filter_type filter;
 };
 
 } // namespace Audio
