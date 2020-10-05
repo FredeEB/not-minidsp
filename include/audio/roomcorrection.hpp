@@ -11,6 +11,7 @@
 
 #include <audio/biquad.hpp>
 #include <audio/fir.hpp>
+#include <audio/parallel.hpp>
 
 namespace Audio {
 
@@ -23,26 +24,29 @@ public:
     using value_type = typename BufferType::value_type;
     using buffer_type = BufferType;
     using filter_type = Biquad<buffer_type>;
+    using process_type = typename repeat_type<filter_type, Channels, Parallel>::type;
 
     void process(buffer_type& buffer) {
-        for (auto& filter : filters) filter.process(buffer);
+        for (auto& filter : filters) {
+            filter.process(buffer);
+        }
     }
 
     void registerFilter(filter_type&& filter) { filters.push_back(std::forward<decltype(filter)>(filter)); }
     void clearFilters() { filters.clear(); }
 
-    void loadFiltersFromFile(std::string const& path) {
-        std::ifstream file(path);
-        std::istream_iterator<filter_type> begin(file), end;
-        std::copy(begin, end, std::back_inserter(filters));
-    }
+    // void loadFiltersFromFile(std::string const& path) {
+    //     std::ifstream file(path);
+    //     std::istream_iterator<filter_type> begin(file), end;
+    //     std::copy(begin, end, std::back_inserter(filters));
+    // }
 
     void printfilters(std::ostream& where) {
         std::copy(filters.begin(), filters.end(), std::ostream_iterator<filter_type>(where, "\n"));
     }
 
 private:
-    std::vector<filter_type> filters;
+    std::vector<process_type> filters;
 };
 
 template <typename BufferType, std::size_t Channels>
