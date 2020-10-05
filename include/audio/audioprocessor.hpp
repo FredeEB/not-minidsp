@@ -15,7 +15,7 @@
 
 namespace Audio {
 template <template <typename BufferType, std::size_t Channels, typename... Tag> typename Algorithm, typename Tag,
-          typename BufferType = std::array<float, 32>, std::size_t Channels = 1>
+          typename BufferType = std::array<float, 32>, std::size_t Channels = 2>
 class AudioProcessor {
 public:
     using value_type = typename BufferType::value_type;
@@ -33,9 +33,9 @@ public:
     }
 
     void run() {
-        auto err =
-                Pa_OpenDefaultStream(&stream, Channels, Channels, Util::NumberType<value_type>::value,
-                                     Util::Singleton<Util::Config>().SampleRate, buffer.size(), StreamCallback, this);
+        auto err = Pa_OpenDefaultStream(
+                &stream, Channels, Channels, Util::NumberType<value_type>::value | paNonInterleaved,
+                Util::Singleton<Util::Config>().SampleRate, buffer.size(), StreamCallback, this);
         if (err != paNoError) throw std::runtime_error("Failed to open stream");
         Pa_StartStream(stream);
     }
