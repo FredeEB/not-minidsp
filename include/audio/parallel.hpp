@@ -1,10 +1,9 @@
 #ifndef CHANNELS_H
 #define CHANNELS_H
 
+#include <bits/c++config.h>
 #include <cstdint>
-#include <array>
 #include <functional>
-#include <initializer_list>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -14,23 +13,30 @@ namespace Audio {
 template <typename... Algorithm>
 class Parallel {
 public:
-    static_assert(std::is_same_v<typename Algorithm::buffer_type...>, "Buffers must be the same type");
+    // static_assert(std::is_same_v<typename Algorithm::buffer_type...>, "Buffers must be the same type");
     using algorithm_type = std::tuple<Algorithm...>;
-    using buffer_type =
-            typename std::remove_reference_t<decltype(std::get<0>(std::declval<algorithm_type>()))>::buffer_type;
 
     constexpr Parallel() = default;
-    // template <typename... Args>
-    // constexpr Parallel(Args... args) : algorithms(args...) {}
 
-    void process(buffer_type& buffer) { process_impl(buffer, std::make_index_sequence<sizeof...(Algorithm)>()); }
+    template <typename... Args>
+    constexpr Parallel(Args... args) : algorithms(Algorithm(args...)...) {}
 
-private:
-    template <std::size_t... Idx>
-    void process_impl(buffer_type& buffer, std::index_sequence<Idx...>) {
-        std::apply([&](auto& element) -> void { element.process(buffer); }, algorithms);
+    template <typename BufferType>
+    void process(BufferType& buffer) {
+        process_impl(buffer, std::index_sequence_for<Algorithm...>());
     }
 
+    template <typename BufferType, std::size_t... idx>
+    void process_impl(BufferType& buffer, std::index_sequence<idx...>) {
+        (..., std::get<idx>(algorithms).process(std::get<idx>(buffer)));
+    }
+
+    template <std::size_t Index>
+    auto get() {
+        return std::get<Index>(algorithms);
+    }
+
+private:
     algorithm_type algorithms;
 };
 
