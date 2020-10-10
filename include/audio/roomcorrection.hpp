@@ -12,6 +12,7 @@
 #include <audio/biquad.hpp>
 #include <audio/fir.hpp>
 #include <audio/parallel.hpp>
+#include <util/repeat_type.hpp>
 
 namespace Audio {
 
@@ -34,18 +35,21 @@ public:
     void registerFilter(filter_type&& filter) { filters.push_back(std::forward<decltype(filter)>(filter)); }
     void clearFilters() { filters.clear(); }
 
-    // void loadFiltersFromFile(std::string const& path) {
-    //     std::ifstream file(path);
-    //     std::istream_iterator<filter_type> begin(file), end;
-    //     std::copy(begin, end, std::back_inserter(filters));
-    // }
+    void loadFiltersFromFile(std::string const& path) {
+        std::ifstream file(path);
+        if (!file.is_open()) throw std::runtime_error("Couldn't open file");
+        std::istream_iterator<filter_type> begin(file), end;
+        std::transform(begin, end, std::back_inserter(filters),
+                       [](auto const& filter) { return process_type(filter); });
+    }
 
     void printfilters(std::ostream& where) {
-        std::copy(filters.begin(), filters.end(), std::ostream_iterator<filter_type>(where, "\n"));
+        std::transform(filters.begin(), filters.end(), std::ostream_iterator<filter_type>(where, "\n"),
+                       [](auto& filter) { return filter.template get<0>(); });
     }
 
 private:
-    std::vector<process_type> filters;
+    std::vector<process_type> filters{};
 };
 
 template <typename SystemTraits>
