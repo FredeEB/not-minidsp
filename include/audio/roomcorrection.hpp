@@ -27,9 +27,7 @@ public:
     using process_type = typename Util::repeat_type<filter_type, SystemTraits::channels, Parallel>::type;
 
     void process(buffer_type& buffer) {
-        for (auto& filter : filters) {
-            filter.process(buffer);
-        }
+        for (auto& filter : filters) filter.process(buffer);
     }
 
     void registerFilter(filter_type&& filter) { filters.push_back(std::forward<decltype(filter)>(filter)); }

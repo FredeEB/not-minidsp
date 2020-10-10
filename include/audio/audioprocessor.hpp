@@ -64,13 +64,19 @@ private:
         auto self = static_cast<AudioProcessor*>(object);
         auto inbuffer = static_cast<value_type const*>(input);
         auto outbuffer = static_cast<value_type*>(output);
-        for (std::size_t i = 0; i < frameCount; ++i) {
-            self->buffer[i] = inbuffer[i];
-        }
-        self->algorithm.process(self->buffer);
-        for (std::size_t i = 0; i < frameCount; ++i) {
-            outbuffer[i] = self->buffer[i];
-        }
+
+        if (frameCount != SystemTraits::frame_size) throw std::runtime_error("Framecount != buffersize");
+
+        for (std::size_t channel = 0; channel < SystemTraits::channels; ++channel)
+            for (std::size_t sample = 0; sample < SystemTraits::channel_size; ++sample)
+                self->buffers.at(channel).at(sample) = inbuffer[channel * SystemTraits::channel_size + sample];
+
+        self->algorithm.process(self->buffers);
+
+        for (std::size_t channel = 0; channel < SystemTraits::channels; ++channel)
+            for (std::size_t sample = 0; sample < SystemTraits::channel_size; ++sample)
+                outbuffer[channel * SystemTraits::channel_size + sample] = self->buffers.at(channel).at(sample);
+
         return paContinue;
     }
 
