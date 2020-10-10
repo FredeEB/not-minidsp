@@ -3,24 +3,33 @@
 
 #include <algorithm>
 #include <array>
+#include <cstring>
+#include <iterator>
 #include <memory>
 #include <stdexcept>
-#include <thread>
+#include <tuple>
+#include <utility>
 
 #include <util/config.hpp>
 #include <util/numbertype.hpp>
 #include <util/singleton.hpp>
+#include <util/repeat_type.hpp>
+#include <audio/parallel.hpp>
+#include <audio/processortraits.hpp>
 
+#include <bits/c++config.h>
 #include <portaudio.h>
+#include <iostream>
 
 namespace Audio {
-template <template <typename BufferType, std::size_t Channels, typename... Tag> typename Algorithm, typename Tag,
-          typename BufferType = std::array<float, 32>, std::size_t Channels = 2>
+template <template <typename SystemTraits, typename... Tag> typename Algorithm, typename Tag,
+          typename SystemTraits = SystemTraits<float, 64, 2>>
 class AudioProcessor {
 public:
-    using value_type = typename BufferType::value_type;
-    using algorithm_type = Algorithm<BufferType, Channels, Tag>;
-    using buffer_type = BufferType;
+    using value_type = typename SystemTraits::value_type;
+    using channel_type = typename SystemTraits::channel_type;
+    using buffer_type = typename SystemTraits::buffer_type;
+    using algorithm_type = Algorithm<SystemTraits, Tag>;
 
     template <typename... Args>
     AudioProcessor(Args... args) : algorithm(args...) {
@@ -33,9 +42,10 @@ public:
     }
 
     void run() {
-        auto err = Pa_OpenDefaultStream(
-                &stream, Channels, Channels, Util::NumberType<value_type>::value | paNonInterleaved,
-                Util::Singleton<Util::Config>().SampleRate, buffer.size(), StreamCallback, this);
+        auto err = Pa_OpenDefaultStream(&stream, SystemTraits::channels, SystemTraits::channels,
+                                        Util::NumberType<value_type>::value | paNonInterleaved,
+                                        Util::Singleton<Util::Config>().SampleRate, SystemTraits::frame_size,
+                                        StreamCallback, this);
         if (err != paNoError) throw std::runtime_error("Failed to open stream");
         Pa_StartStream(stream);
     }
@@ -64,10 +74,9 @@ private:
         return paContinue;
     }
 
-    buffer_type buffer;
+    buffer_type buffers{};
     PaStream* stream{};
     algorithm_type algorithm;
-    std::thread process;
     bool running{false};
 };
 
