@@ -29,7 +29,7 @@ public:
     constexpr Filter(value_type ca1, value_type ca2, value_type cb0, value_type cb1, value_type cb2)
             : a1{ca1}, a2{ca2}, b0{cb0}, b1{cb1}, b2{cb2} {}
 
-    void process(buffer_type& buffer) {
+    inline void process(buffer_type& buffer) noexcept {
         for (std::size_t i = 0; i < buffer.size(); ++i) {
             xn2 = xn1;
             xn1 = xn0;

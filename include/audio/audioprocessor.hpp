@@ -55,7 +55,7 @@ public:
         Pa_CloseStream(stream);
     }
 
-    inline algorithm_type& algo() { return algorithm; }
+    inline algorithm_type& algo() noexcept { return algorithm; }
 
 private:
     // Callback function for audiostream. Will call process on algorithm
