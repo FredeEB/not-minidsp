@@ -42,10 +42,20 @@ public:
     }
 
     void run() {
-        auto err = Pa_OpenDefaultStream(&stream, SystemTraits::channels, SystemTraits::channels,
+        PaDeviceInfo const* dev = Pa_GetDeviceInfo(Pa_GetDeviceCount() - 1);
+        if (dev->maxInputChannels < SystemTraits::channels)
+            throw std::runtime_error("Device doesn't have anough input channels for requested configuration");
+        if (dev->maxOutputChannels < SystemTraits::channels)
+            throw std::runtime_error("Device doesn't have anough output channels for requested configuration");
+
+        PaStreamParameters inparams = {Pa_GetDeviceCount() - 1, SystemTraits::channels,
+                                       Util::NumberType<value_type>::value | paNonInterleaved,
+                                       dev->defaultHighInputLatency, nullptr};
+        PaStreamParameters outparams = {Pa_GetDeviceCount() - 1, SystemTraits::channels,
                                         Util::NumberType<value_type>::value | paNonInterleaved,
-                                        Util::Singleton<Util::Config>().SampleRate, SystemTraits::frame_size,
-                                        StreamCallback, this);
+                                        dev->defaultHighOutputLatency, nullptr};
+        auto err = Pa_OpenStream(&stream, &inparams, &outparams, Util::Singleton<Util::Config>().SampleRate,
+                                 SystemTraits::channel_size, paClipOff, StreamCallback, this);
         if (err != paNoError) throw std::runtime_error("Failed to open stream");
         Pa_StartStream(stream);
     }
