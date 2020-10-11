@@ -69,23 +69,21 @@ public:
 
 private:
     // Callback function for audiostream. Will call process on algorithm
-    inline static int StreamCallback(const void* input, void* output, unsigned long frameCount,
-                                     const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* object) {
+    inline static int StreamCallback(const void* input, void* output, unsigned long, const PaStreamCallbackTimeInfo*,
+                                     PaStreamCallbackFlags, void* object) {
         auto self = static_cast<AudioProcessor*>(object);
-        auto inbuffer = static_cast<value_type const*>(input);
-        auto outbuffer = static_cast<value_type*>(output);
-
-        if (frameCount != SystemTraits::frame_size) throw std::runtime_error("Framecount != buffersize");
+        auto inbuffer = static_cast<value_type* const*>(input);
+        auto outbuffer = static_cast<value_type**>(output);
 
         for (std::size_t channel = 0; channel < SystemTraits::channels; ++channel)
             for (std::size_t sample = 0; sample < SystemTraits::channel_size; ++sample)
-                self->buffers.at(channel).at(sample) = inbuffer[channel * SystemTraits::channel_size + sample];
+                self->buffers[channel][sample] = inbuffer[channel][sample];
 
         self->algorithm.process(self->buffers);
 
         for (std::size_t channel = 0; channel < SystemTraits::channels; ++channel)
             for (std::size_t sample = 0; sample < SystemTraits::channel_size; ++sample)
-                outbuffer[channel * SystemTraits::channel_size + sample] = self->buffers.at(channel).at(sample);
+                outbuffer[channel][sample] = self->buffers[channel][sample];
 
         return paContinue;
     }
