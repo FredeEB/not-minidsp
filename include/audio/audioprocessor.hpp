@@ -18,6 +18,7 @@
 #include <audio/processortraits.hpp>
 
 #include <bits/c++config.h>
+#include <fmt/core.h>
 #include <portaudio.h>
 #include <iostream>
 
@@ -58,6 +59,7 @@ public:
                                  SystemTraits::channel_size, paClipOff, StreamCallback, this);
         if (err != paNoError) throw std::runtime_error("Failed to open stream");
         Pa_StartStream(stream);
+        fmt::print("Opened device: {}\n", dev->name);
     }
 
     inline void stop() noexcept {
