@@ -5,10 +5,10 @@
 
 namespace Audio {
 
-template <typename BufferType, std::size_t Channels, typename = void>
+template <typename SystemTraits, typename = void>
 class Passthrough {
 public:
-    using buffer_type = BufferType;
+    using buffer_type = typename SystemTraits::buffer_type;
     void process(buffer_type&) {}
 };
 

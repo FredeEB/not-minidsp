@@ -3,24 +3,34 @@
 
 #include <algorithm>
 #include <array>
+#include <cstring>
+#include <iterator>
 #include <memory>
 #include <stdexcept>
-#include <thread>
+#include <tuple>
+#include <utility>
 
 #include <util/config.hpp>
 #include <util/numbertype.hpp>
 #include <util/singleton.hpp>
+#include <util/repeat_type.hpp>
+#include <audio/parallel.hpp>
+#include <audio/processortraits.hpp>
 
+#include <bits/c++config.h>
+#include <fmt/core.h>
 #include <portaudio.h>
+#include <iostream>
 
 namespace Audio {
-template <template <typename BufferType, std::size_t Channels, typename... Tag> typename Algorithm, typename Tag,
-          typename BufferType = std::array<float, 32>, std::size_t Channels = 1>
+template <template <typename SystemTraits, typename... Tag> typename Algorithm, typename Tag,
+          typename SystemTraits = SystemTraits<float, 64, 2>>
 class AudioProcessor {
 public:
-    using value_type = typename BufferType::value_type;
-    using algorithm_type = Algorithm<BufferType, Channels, Tag>;
-    using buffer_type = BufferType;
+    using value_type = typename SystemTraits::value_type;
+    using channel_type = typename SystemTraits::channel_type;
+    using buffer_type = typename SystemTraits::buffer_type;
+    using algorithm_type = Algorithm<SystemTraits, Tag>;
 
     template <typename... Args>
     AudioProcessor(Args... args) : algorithm(args...) {
@@ -33,11 +43,23 @@ public:
     }
 
     void run() {
-        auto err =
-                Pa_OpenDefaultStream(&stream, Channels, Channels, Util::NumberType<value_type>::value,
-                                     Util::Singleton<Util::Config>().SampleRate, buffer.size(), StreamCallback, this);
+        PaDeviceInfo const* dev = Pa_GetDeviceInfo(Pa_GetDeviceCount() - 1);
+        if (dev->maxInputChannels < SystemTraits::channels)
+            throw std::runtime_error("Device doesn't have anough input channels for requested configuration");
+        if (dev->maxOutputChannels < SystemTraits::channels)
+            throw std::runtime_error("Device doesn't have anough output channels for requested configuration");
+
+        PaStreamParameters inparams = {Pa_GetDeviceCount() - 1, SystemTraits::channels,
+                                       Util::NumberType<value_type>::value | paNonInterleaved,
+                                       dev->defaultHighInputLatency, nullptr};
+        PaStreamParameters outparams = {Pa_GetDeviceCount() - 1, SystemTraits::channels,
+                                        Util::NumberType<value_type>::value | paNonInterleaved,
+                                        dev->defaultHighOutputLatency, nullptr};
+        auto err = Pa_OpenStream(&stream, &inparams, &outparams, Util::Singleton<Util::Config>().SampleRate,
+                                 SystemTraits::channel_size, paClipOff, StreamCallback, this);
         if (err != paNoError) throw std::runtime_error("Failed to open stream");
         Pa_StartStream(stream);
+        fmt::print("Opened device: {}\n", dev->name);
     }
 
     inline void stop() noexcept {
@@ -45,29 +67,32 @@ public:
         Pa_CloseStream(stream);
     }
 
-    inline algorithm_type& algo() { return algorithm; }
+    inline algorithm_type& algo() noexcept { return algorithm; }
 
 private:
     // Callback function for audiostream. Will call process on algorithm
-    inline static int StreamCallback(const void* input, void* output, unsigned long frameCount,
-                                     const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* object) {
+    inline static int StreamCallback(const void* input, void* output, unsigned long, const PaStreamCallbackTimeInfo*,
+                                     PaStreamCallbackFlags, void* object) {
         auto self = static_cast<AudioProcessor*>(object);
-        auto inbuffer = static_cast<value_type const*>(input);
-        auto outbuffer = static_cast<value_type*>(output);
-        for (std::size_t i = 0; i < frameCount; ++i) {
-            self->buffer[i] = inbuffer[i];
-        }
-        self->algorithm.process(self->buffer);
-        for (std::size_t i = 0; i < frameCount; ++i) {
-            outbuffer[i] = self->buffer[i];
-        }
+        auto inbuffer = static_cast<value_type* const*>(input);
+        auto outbuffer = static_cast<value_type**>(output);
+
+        for (std::size_t channel = 0; channel < SystemTraits::channels; ++channel)
+            for (std::size_t sample = 0; sample < SystemTraits::channel_size; ++sample)
+                self->buffers[channel][sample] = inbuffer[channel][sample];
+
+        self->algorithm.process(self->buffers);
+
+        for (std::size_t channel = 0; channel < SystemTraits::channels; ++channel)
+            for (std::size_t sample = 0; sample < SystemTraits::channel_size; ++sample)
+                outbuffer[channel][sample] = self->buffers[channel][sample];
+
         return paContinue;
     }
 
-    buffer_type buffer;
+    buffer_type buffers{};
     PaStream* stream{};
     algorithm_type algorithm;
-    std::thread process;
     bool running{false};
 };
 
