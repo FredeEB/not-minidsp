@@ -54,7 +54,8 @@ template <typename SystemTraits>
 class RoomCorrection<SystemTraits, FIRTag> {
 public:
     using buffer_type = typename SystemTraits::buffer_type;
-    using filter_type = FIRFilter<buffer_type>;
+    using filter_type = FIRFilter<typename SystemTraits::channel_type>;
+    using process_type = typename Util::repeat_type<filter_type, SystemTraits::channels, Parallel>::type;
 
     constexpr RoomCorrection(std::size_t taps) : filter(taps) {}
 
@@ -66,7 +67,7 @@ public:
     }
 
 private:
-    filter_type filter{};
+    process_type filter{};
 };
 
 } // namespace Audio

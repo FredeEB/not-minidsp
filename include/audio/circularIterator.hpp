@@ -8,6 +8,7 @@ template <typename BufferType, typename Iter>
 class circular_iterator : public std::iterator<std::bidirectional_iterator_tag, BufferType> {
 public:
     using value_type = typename BufferType::value_type;
+    using perimeter_iterator = typename BufferType::iterator;
     using buffer_iterator = Iter;
 
     circular_iterator(BufferType& buffer, buffer_iterator offset)
@@ -43,8 +44,8 @@ public:
     value_type& operator->() { return *p; }
 
 private:
-    buffer_iterator const begin, end;
-    buffer_iterator p;
+    perimeter_iterator begin, end;
+    Iter p;
 };
 } // namespace Audio
 
