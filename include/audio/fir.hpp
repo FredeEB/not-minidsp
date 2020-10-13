@@ -28,13 +28,13 @@ public:
     constexpr Filter(std::size_t taps) : coefficients(taps), delayline(taps) {}
     constexpr Filter(std::vector<float> coeffs) : coefficients(std::move(coeffs)), delayline(coefficients.size()) {}
 
-    void process(buffer_type& buffer) {
+    inline void process(buffer_type& buffer) noexcept {
         std::transform(buffer.begin(), buffer.end(), buffer.begin(),
                        [&](auto sample) { return calculateSample(sample); });
     }
 
 private:
-    inline value_type calculateSample(value_type value) {
+    inline value_type calculateSample(value_type value) noexcept {
 
         *delaylinehead = value;
 
