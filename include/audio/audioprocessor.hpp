@@ -17,7 +17,6 @@
 #include <audio/parallel.hpp>
 #include <audio/processortraits.hpp>
 
-#include <bits/c++config.h>
 #include <fmt/core.h>
 #include <portaudio.h>
 #include <iostream>
