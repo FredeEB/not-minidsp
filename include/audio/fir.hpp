@@ -19,9 +19,6 @@ template <typename BufferType>
 using FIRFilter = Filter<BufferType, FIRTag>;
 
 template <typename BufferType>
-std::istream& operator>>(std::istream&, FIRFilter<BufferType>&);
-
-template <typename BufferType>
 class Filter<BufferType, FIRTag> {
 public:
     using buffer_type = BufferType;
@@ -34,8 +31,6 @@ public:
         std::transform(buffer.begin(), buffer.end(), buffer.begin(),
                        [&](auto sample) { return calculateSample(sample); });
     }
-
-    friend std::istream& operator>><buffer_type>(std::istream&, Filter&);
 
 private:
     inline value_type calculateSample(value_type value) {
@@ -55,13 +50,6 @@ private:
     delayline_type delayline;
     typename delayline_type::iterator delaylinehead = delayline.begin();
 };
-
-template <typename BufferType>
-std::istream& operator>>(std::istream& is, FIRFilter<BufferType>& filter) {
-    std::istream_iterator<typename BufferType::value_type> begin(is), end;
-    std::copy(begin, end, std::back_inserter(filter.coefficients));
-    return is;
-}
 
 } // namespace Audio
 
