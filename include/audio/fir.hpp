@@ -26,6 +26,7 @@ public:
     using delayline_type = std::vector<value_type>;
 
     constexpr Filter(std::size_t taps) : coefficients(taps), delayline(taps) {}
+    constexpr Filter(std::vector<float> coeffs) : coefficients(std::move(coeffs)), delayline(coefficients.size()) {}
 
     void process(buffer_type& buffer) {
         std::transform(buffer.begin(), buffer.end(), buffer.begin(),
