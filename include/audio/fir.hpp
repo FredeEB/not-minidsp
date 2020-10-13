@@ -35,13 +35,13 @@ public:
 
 private:
     inline value_type calculateSample(value_type value) {
-        if (delaylinehead == std::prev(delayline.begin())) delaylinehead = std::prev(delayline.end());
 
         *delaylinehead = value;
 
         value_type res = std::transform_reduce(std::execution::par, coefficients.begin(), coefficients.end(),
                                                circular_iterator(delayline, delaylinehead), 0.0f);
 
+        if (delaylinehead == delayline.begin()) delaylinehead = delayline.end();
         --delaylinehead;
 
         return res;
