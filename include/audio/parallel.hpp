@@ -1,7 +1,6 @@
 #ifndef CHANNELS_H
 #define CHANNELS_H
 
-#include <bits/c++config.h>
 #include <cstdint>
 #include <functional>
 #include <tuple>

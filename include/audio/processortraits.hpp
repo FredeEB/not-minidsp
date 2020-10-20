@@ -1,10 +1,7 @@
 #ifndef PROCESSORTRAITS_H
 #define PROCESSORTRAITS_H
 
-#include <bits/c++config.h>
 #include <array>
-#include <tuple>
-#include "util/repeat_type.hpp"
 template <typename ValueType, std::size_t ChannelSize, std::size_t Channels>
 struct SystemTraits {
     static constexpr auto channels = Channels;
