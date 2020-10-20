@@ -9,6 +9,7 @@
 #include <audio/sine.hpp>
 #include <audio/autosystem.hpp>
 #include <audio/biquad.hpp>
+#include <audio/fir.hpp>
 int main(int argc, char** argv) {
     // initialize portaudio
     AutoSystem sys;

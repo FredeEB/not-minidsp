@@ -32,8 +32,7 @@ public:
     using algorithm_type = Algorithm<SystemTraits, Tag>;
 
     template <typename... Args>
-    AudioProcessor(Args... args) : algorithm(args...) {
-    }
+    AudioProcessor(algorithm_type& algo) : algorithm{algo} {}
     ~AudioProcessor() { stop(); }
 
     void run() {
@@ -86,7 +85,7 @@ private:
 
     buffer_type buffers{};
     PaStream* stream{};
-    algorithm_type algorithm;
+    algorithm_type& algorithm;
     bool running{false};
 };
 

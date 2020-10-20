@@ -1,18 +1,15 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <cstdint>
-#include <boost/log/trivial.hpp>
-#include <boost/log/expressions.hpp>
+#include <string>
 
 namespace Util {
 
 struct Config {
-    void set_logging_severity(boost::log::trivial::severity_level level) {
-        boost::log::core::get()->set_filter(boost::log::trivial::severity >= level);
-    }
+    std::string FilterPath;
+    std::string Algorithm;
     double SampleRate{48000.0};
-    int deviceIndex;
+    int DeviceIndex;
 };
 
 } // namespace Util
