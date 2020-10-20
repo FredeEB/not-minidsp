@@ -7,10 +7,12 @@
 #include <audio/audioprocessor.hpp>
 #include <audio/roomcorrection.hpp>
 #include <audio/sine.hpp>
+#include <audio/autosystem.hpp>
 #include <audio/biquad.hpp>
+int main(int argc, char** argv) {
+    // initialize portaudio
+    AutoSystem sys;
 
-int main() {
-    Audio::AudioProcessor<Audio::RoomCorrection, Audio::FIRTag> processor(1024UL);
 
     processor.algo().loadFilterFromFile("filter.txt");
     processor.run();

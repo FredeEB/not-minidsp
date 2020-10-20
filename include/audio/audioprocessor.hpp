@@ -33,13 +33,8 @@ public:
 
     template <typename... Args>
     AudioProcessor(Args... args) : algorithm(args...) {
-        auto err = Pa_Initialize();
-        if (err != paNoError) throw std::runtime_error("Failed to initialize Portaudio");
     }
-    ~AudioProcessor() noexcept {
-        stop();
-        Pa_Terminate();
-    }
+    ~AudioProcessor() { stop(); }
 
     void run() {
         PaDeviceInfo const* dev = Pa_GetDeviceInfo(Pa_GetDeviceCount() - 1);
