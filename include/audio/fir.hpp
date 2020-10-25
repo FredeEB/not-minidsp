@@ -6,7 +6,6 @@
 #include <vector>
 #include <istream>
 #include <numeric>
-#include <execution>
 
 #include <audio/filter.hpp>
 #include <audio/circularIterator.hpp>
@@ -37,7 +36,7 @@ private:
     inline value_type calculateSample(value_type value) noexcept {
         *delaylinehead = value;
 
-        value_type res = std::transform_reduce(std::execution::par, coefficients.begin(), coefficients.end(),
+        value_type res = std::transform_reduce(coefficients.begin(), coefficients.end(),
                                                circular_iterator(delayline, delaylinehead), 0.0f);
 
         if (delaylinehead == delayline.begin()) delaylinehead = delayline.end();
