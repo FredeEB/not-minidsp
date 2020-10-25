@@ -26,6 +26,8 @@ public:
     using filter_type = Biquad<typename SystemTraits::channel_type>;
     using process_type = typename Util::repeat_type<filter_type, SystemTraits::channels, Parallel>::type;
 
+    constexpr explicit RoomCorrection(SystemTraits){};
+
     void process(buffer_type& buffer) {
         for (auto& filter : filters) filter.process(buffer);
     }
@@ -51,6 +53,9 @@ private:
 };
 
 template <typename SystemTraits>
+using BiquadRoomCorrection = RoomCorrection<SystemTraits, FIRTag>;
+
+template <typename SystemTraits>
 class RoomCorrection<SystemTraits, FIRTag> {
 public:
     using value_type = typename SystemTraits::value_type;
@@ -58,21 +63,24 @@ public:
     using filter_type = FIRFilter<typename SystemTraits::channel_type>;
     using process_type = typename Util::repeat_type<filter_type, SystemTraits::channels, Parallel>::type;
 
-    constexpr RoomCorrection(std::size_t taps) : filter(taps) {}
+    constexpr explicit RoomCorrection(SystemTraits){};
 
     void process(buffer_type& buffer) { filter.process(buffer); }
 
-    void loadFilterFromFile(std::string const& path) {
+    void loadFiltersFromFile(std::string const& path) {
         std::ifstream file(path);
-		std::istream_iterator<value_type> begin(file), end;
-		std::vector<value_type> coeffs;
-		std::copy(begin, end, std::back_inserter(coeffs));
-		filter = process_type(coeffs);
+        std::istream_iterator<value_type> begin(file), end;
+        std::vector<value_type> coeffs;
+        std::copy(begin, end, std::back_inserter(coeffs));
+        filter = process_type(coeffs);
     }
 
 private:
     process_type filter{};
 };
+
+template <typename SystemTraits>
+using FIRRoomCorrection = RoomCorrection<SystemTraits, FIRTag>;
 
 } // namespace Audio
 
