@@ -6,7 +6,6 @@
 #include <vector>
 #include <istream>
 #include <numeric>
-#include <execution>
 
 #include <audio/filter.hpp>
 #include <audio/circularIterator.hpp>
@@ -25,8 +24,8 @@ public:
     using value_type = typename buffer_type::value_type;
     using delayline_type = std::vector<value_type>;
 
-    constexpr Filter(std::size_t taps) : coefficients(taps), delayline(taps) {}
-    constexpr Filter(std::vector<float> coeffs) : coefficients(std::move(coeffs)), delayline(coefficients.size()) {}
+    constexpr Filter() = default;
+    constexpr Filter(delayline_type coeffs) : coefficients(std::move(coeffs)), delayline(coefficients.size()) {}
 
     inline void process(buffer_type& buffer) noexcept {
         std::transform(buffer.begin(), buffer.end(), buffer.begin(),
@@ -35,10 +34,9 @@ public:
 
 private:
     inline value_type calculateSample(value_type value) noexcept {
-
         *delaylinehead = value;
 
-        value_type res = std::transform_reduce(std::execution::par, coefficients.begin(), coefficients.end(),
+        value_type res = std::transform_reduce(coefficients.begin(), coefficients.end(),
                                                circular_iterator(delayline, delaylinehead), 0.0f);
 
         if (delaylinehead == delayline.begin()) delaylinehead = delayline.end();

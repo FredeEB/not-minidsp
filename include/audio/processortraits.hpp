@@ -1,10 +1,10 @@
 #ifndef PROCESSORTRAITS_H
 #define PROCESSORTRAITS_H
 
-#include <bits/c++config.h>
 #include <array>
-#include <tuple>
-#include "util/repeat_type.hpp"
+
+namespace Audio {
+
 template <typename ValueType, std::size_t ChannelSize, std::size_t Channels>
 struct SystemTraits {
     static constexpr auto channels = Channels;
@@ -15,5 +15,7 @@ struct SystemTraits {
     using channel_type = std::array<value_type, channel_size>;
     using buffer_type = std::array<channel_type, channels>;
 };
+
+} // namespace Audio
 
 #endif /* PROCESSORTRAITS_H */
