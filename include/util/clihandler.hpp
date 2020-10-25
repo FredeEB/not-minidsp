@@ -62,6 +62,8 @@ void parse_cli(int const argc, char** argv) noexcept {
     }
 }
 
+inline Config& getConfig() { return Singleton<Config>(); }
+
 } // namespace Util
 
 #endif /* CLIHANDLER_H */
