@@ -1,7 +1,6 @@
 #ifndef CLIHANDLER_H
 #define CLIHANDLER_H
 
-#include <fmt/core.h>
 #include <portaudio.h>
 #include <iostream>
 #include <boost/program_options.hpp>
@@ -41,8 +40,7 @@ void parse_cli(int const argc, char** argv) noexcept {
         po::notify(vm);
 
         if (vm.count("help")) {
-            fmt::print("Usage: {} [options]\n{}", argv[0]);
-            std::cout << all;
+            std::cout << "Usage: [options]\n" << argv[0] << '\n' << all;
             exit(1);
         }
         if (vm.count("list-devices")) {
@@ -57,7 +55,7 @@ void parse_cli(int const argc, char** argv) noexcept {
         config.DeviceIndex = vm["device"].as<int>();
 
     } catch (std::exception const& e) {
-        fmt::print("Caught exception while parsing CLI parameters: {}", e.what());
+        std::cout << "Caught exception while parsing CLI parameters: " << e.what();
         exit(1);
     }
 }

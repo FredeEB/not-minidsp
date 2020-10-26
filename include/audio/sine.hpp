@@ -5,7 +5,6 @@
 #include <cassert>
 #include <cmath>
 #include <audio/table.hpp>
-#include <fmt/ranges.h>
 
 namespace Audio {
 

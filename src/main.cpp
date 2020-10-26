@@ -1,5 +1,3 @@
-#include <fmt/core.h>
-
 #include <util/clihandler.hpp>
 #include <audio/audioprocessor.hpp>
 #include <audio/roomcorrection.hpp>
