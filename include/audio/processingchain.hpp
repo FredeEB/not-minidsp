@@ -13,7 +13,7 @@ class ProcessingChain {
 public:
     using system_traits = SystemTraits;
 
-    ProcessingChain(SystemTraits, Algos... algos) : algorithmchain(algos...) {}
+    ProcessingChain(SystemTraits, Algos&... algos) : algorithmchain(algos...) {}
 
     template <typename BufferType>
     inline void process(BufferType& buffer) {
@@ -31,7 +31,7 @@ private:
         (..., std::get<Idx>(algorithmchain).process(buffer));
     }
 
-    std::tuple<Algos...> algorithmchain;
+    std::tuple<Algos&...> algorithmchain;
 };
 
 } // namespace Audio
