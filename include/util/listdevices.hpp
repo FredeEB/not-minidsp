@@ -13,7 +13,6 @@ void print_devices() {
         auto device = Pa_GetDeviceInfo(i);
         std::cout << i << ": " << device->name << '\n';
     }
-    Pa_Terminate();
 }
 
 #endif /* LISTDEVICES_H */
