@@ -1,15 +1,19 @@
 #ifndef CLIHANDLER_H
 #define CLIHANDLER_H
 
-#include <portaudio.h>
 #include <iostream>
-#include <boost/program_options.hpp>
 #include <stdexcept>
+
+#include <portaudio.h>
+#include <boost/program_options.hpp>
+
 #include <util/config.hpp>
 #include <util/singleton.hpp>
 #include <util/listdevices.hpp>
 
 namespace Util {
+
+inline Config& getConfig() { return Singleton<Config>(); }
 
 void parse_cli(int const argc, char** argv) noexcept {
     namespace po = boost::program_options;
@@ -23,7 +27,7 @@ void parse_cli(int const argc, char** argv) noexcept {
         algorithm.add_options()("file,f", po::value<std::string>()->default_value("filter.txt"),
                                 "path to file containing filter-coefficients");
 
-        auto defaultDevice = Pa_GetDeviceCount() - 1;
+        auto const defaultDevice = Pa_GetDeviceCount() - 1;
 
         po::options_description system("System Options");
         system.add_options()("samplerate,s", po::value<double>()->default_value(48000.0),
@@ -48,19 +52,17 @@ void parse_cli(int const argc, char** argv) noexcept {
             exit(1);
         }
 
-        auto& config = Singleton<Config>();
+        auto& config = getConfig();
 
-        config.FilterPath = vm["file"].as<std::string>();
-        config.SampleRate = vm["samplerate"].as<double>();
-        config.DeviceIndex = vm["device"].as<int>();
+        config.filterPath = vm["file"].as<std::string>();
+        config.sampleRate = vm["samplerate"].as<double>();
+        config.deviceIndex = vm["device"].as<int>();
 
     } catch (std::exception const& e) {
         std::cout << "Caught exception while parsing CLI parameters: " << e.what();
         exit(1);
     }
 }
-
-inline Config& getConfig() { return Singleton<Config>(); }
 
 } // namespace Util
 
