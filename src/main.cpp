@@ -14,13 +14,14 @@ int main(int argc, char** argv) {
     // initialize portaudio
     AutoSystem sys;
 
+    Util::parse_cli(argc, argv);
 
-    SystemTraits<float, 512, 2> traits;
+    SystemTraits<float, 256, 2> traits;
 
     auto& config = Util::getConfig();
 
-    RoomCorrection<decltype(traits), FIRTag> rc(traits);
-    rc.loadFiltersFromFile(config.FilterPath);
+    RoomCorrection<decltype(traits), FIRTag> rc;
+    rc.loadFiltersFromFile(config.filterPath);
 
     ProcessingChain chain(traits, rc);
 
