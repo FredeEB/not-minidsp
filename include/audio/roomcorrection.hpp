@@ -22,11 +22,10 @@ class RoomCorrection;
 template <typename SystemTraits>
 class RoomCorrection<SystemTraits, BiquadTag> {
 public:
-    using buffer_type = typename SystemTraits::buffer_type;
-    using filter_type = Biquad<typename SystemTraits::channel_type>;
-    using process_type = typename Util::repeat_type<filter_type, SystemTraits::channels, Parallel>::type;
-
-    constexpr explicit RoomCorrection(SystemTraits){};
+    using system_traits = SystemTraits;
+    using buffer_type = typename system_traits::buffer_type;
+    using filter_type = Biquad<typename system_traits::channel_type>;
+    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::type;
 
     void process(buffer_type& buffer) {
         for (auto& filter : filters) filter.process(buffer);
@@ -58,12 +57,13 @@ using BiquadRoomCorrection = RoomCorrection<SystemTraits, FIRTag>;
 template <typename SystemTraits>
 class RoomCorrection<SystemTraits, FIRTag> {
 public:
-    using value_type = typename SystemTraits::value_type;
-    using buffer_type = typename SystemTraits::buffer_type;
-    using filter_type = FIRFilter<typename SystemTraits::channel_type>;
-    using process_type = typename Util::repeat_type<filter_type, SystemTraits::channels, Parallel>::type;
+    using system_traits = SystemTraits;
+    using value_type = typename system_traits::value_type;
+    using buffer_type = typename system_traits::buffer_type;
+    using filter_type = FIRFilter<typename system_traits::channel_type>;
+    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::type;
 
-    constexpr explicit RoomCorrection(SystemTraits){};
+    constexpr explicit RoomCorrection(){};
 
     void process(buffer_type& buffer) { filter.process(buffer); }
 

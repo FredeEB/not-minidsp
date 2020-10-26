@@ -6,10 +6,9 @@
 namespace Util {
 
 struct Config {
-    std::string FilterPath;
-    std::string Algorithm;
-    double SampleRate{48000.0};
-    int DeviceIndex;
+    std::string filterPath;
+    double sampleRate{48000.0};
+    int deviceIndex;
 };
 
 } // namespace Util
