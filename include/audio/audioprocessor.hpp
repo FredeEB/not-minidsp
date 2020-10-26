@@ -31,7 +31,7 @@ public:
     AudioProcessor(Algorithm& algo) : algorithm{algo} {}
     ~AudioProcessor() { stop(); }
 
-    void run() {
+    inline void run() {
         auto const deviceIndex = Util::getConfig().deviceIndex;
         PaDeviceInfo const* dev = Pa_GetDeviceInfo(deviceIndex);
         if (dev->maxInputChannels < system_traits::channels)
