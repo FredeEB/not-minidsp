@@ -10,10 +10,9 @@
 #include <tuple>
 #include <utility>
 
-#include <util/config.hpp>
 #include <util/numbertype.hpp>
-#include <util/singleton.hpp>
 #include <util/repeat_type.hpp>
+#include <util/clihandler.hpp>
 #include <audio/parallel.hpp>
 #include <audio/processortraits.hpp>
 
@@ -33,19 +32,20 @@ public:
     ~AudioProcessor() { stop(); }
 
     void run() {
-        PaDeviceInfo const* dev = Pa_GetDeviceInfo(Pa_GetDeviceCount() - 1);
+        auto const deviceIndex = Util::getConfig().deviceIndex;
+        PaDeviceInfo const* dev = Pa_GetDeviceInfo(deviceIndex);
         if (dev->maxInputChannels < system_traits::channels)
             throw std::runtime_error("Device doesn't have anough input channels for requested configuration");
         if (dev->maxOutputChannels < system_traits::channels)
             throw std::runtime_error("Device doesn't have anough output channels for requested configuration");
 
-        PaStreamParameters inparams = {Pa_GetDeviceCount() - 1, system_traits::channels,
+        PaStreamParameters inparams = {deviceIndex, system_traits::channels,
                                        Util::NumberType<value_type>::value | paNonInterleaved,
                                        dev->defaultHighInputLatency, nullptr};
-        PaStreamParameters outparams = {Pa_GetDeviceCount() - 1, system_traits::channels,
+        PaStreamParameters outparams = {deviceIndex, system_traits::channels,
                                         Util::NumberType<value_type>::value | paNonInterleaved,
                                         dev->defaultHighOutputLatency, nullptr};
-        auto err = Pa_OpenStream(&stream, &inparams, &outparams, Util::Singleton<Util::Config>().SampleRate,
+        auto err = Pa_OpenStream(&stream, &inparams, &outparams, Util::getConfig().sampleRate,
                                  system_traits::channel_size, paClipOff, StreamCallback, this);
         if (err != paNoError) throw std::runtime_error("Failed to open stream");
         Pa_StartStream(stream);
