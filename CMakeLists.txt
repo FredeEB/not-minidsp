@@ -5,39 +5,28 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ### BINARY
-add_executable(prog)
+add_executable(fir-rc)
+add_executable(bypass)
 
-target_include_directories(prog PUBLIC include)
-target_compile_options(
-  prog PRIVATE
-  -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wsign-conversion -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast -Wdouble-promotion -Wformat=2
-)
+include_directories(include)
+
+add_library(compile_options INTERFACE)
+target_compile_options(compile_options INTERFACE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wsign-conversion -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast -Wdouble-promotion -Wformat=2)
 
 add_subdirectory(src)
-# add_subdirectory(deps)
 
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
-target_link_libraries(prog PUBLIC Threads::Threads portaudio Boost::program_options)
+target_link_libraries(fir-rc PUBLIC Threads::Threads portaudio Boost::program_options compile_options)
+target_link_libraries(bypass PUBLIC Threads::Threads portaudio Boost::program_options compile_options)
 
 ### RUN BINARY TARGET (make run)
 add_custom_target(
   run
-  COMMAND ${CMAKE_BINARY_DIR}/prog
+  COMMAND ${CMAKE_BINARY_DIR}/fir-rc
 )
-add_dependencies(run prog)
-
-### TIDY/FORMAT
-get_target_property(PROGRAM_SOURCES prog SOURCES)
-add_custom_target(
-  format
-  COMMAND clang-format -i ${PROGRAM_SOURCES}
-)
-add_custom_target(
-  tidy
-  COMMAND clang-tidy ${PROGRAM_SOURCES}
-)
+add_dependencies(run fir-rc)
 
 ### EXTRA OPTIONS
 option(ENABLE_CLANG_TIDY "Sets whether clang tidy should fix code or not" OFF)
@@ -49,6 +38,6 @@ endif()
 
 option(ENABLE_SANITIZERS "Enable address and undefined snitizers" OFF)
 if(ENABLE_SANITIZERS MATCHES ON)
-  target_link_libraries(prog PUBLIC -fsanitize=address,undefined)
-  target_compile_options(prog PUBLIC -fsanitize=address,undefined)
+  target_link_libraries(fir-rc PUBLIC -fsanitize=address,undefined)
+  target_compile_options(fir-rc PUBLIC -fsanitize=address,undefined)
 endif()
