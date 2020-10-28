@@ -52,9 +52,6 @@ private:
 };
 
 template <typename SystemTraits>
-using BiquadRoomCorrection = RoomCorrection<SystemTraits, FIRTag>;
-
-template <typename SystemTraits>
 class RoomCorrection<SystemTraits, FIRTag> {
 public:
     using system_traits = SystemTraits;
@@ -78,9 +75,6 @@ public:
 private:
     process_type filter{};
 };
-
-template <typename SystemTraits>
-using FIRRoomCorrection = RoomCorrection<SystemTraits, FIRTag>;
 
 } // namespace Audio
 

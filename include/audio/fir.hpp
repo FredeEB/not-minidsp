@@ -15,17 +15,14 @@ namespace Audio {
 struct FIRTag {};
 
 template <typename BufferType>
-using FIRFilter = Filter<BufferType, FIRTag>;
-
-template <typename BufferType>
-class Filter<BufferType, FIRTag> {
+class FIRFilter {
 public:
     using buffer_type = BufferType;
     using value_type = typename buffer_type::value_type;
     using delayline_type = std::vector<value_type>;
 
-    constexpr Filter() = default;
-    constexpr Filter(delayline_type coeffs) : coefficients(std::move(coeffs)), delayline(coefficients.size()) {}
+    constexpr FIRFilter() = default;
+    constexpr FIRFilter(delayline_type coeffs) : coefficients(std::move(coeffs)), delayline(coefficients.size()) {}
 
     inline void process(buffer_type& buffer) noexcept {
         std::transform(buffer.begin(), buffer.end(), buffer.begin(),

@@ -12,21 +12,19 @@ namespace Audio {
 struct BiquadTag {};
 
 template <typename BufferType>
-using Biquad = Filter<BufferType, BiquadTag>;
+class Biquad;
 
 template <typename BufferType>
 std::istream& operator>>(std::istream&, Biquad<BufferType>&);
-template <typename BufferType>
-std::ostream& operator<<(std::ostream&, Biquad<BufferType> const&);
 
 template <typename BufferType>
-class Filter<BufferType, BiquadTag> {
+class Biquad {
 public:
     using buffer_type = BufferType;
     using value_type = typename buffer_type::value_type;
 
-    constexpr Filter() = default;
-    constexpr Filter(value_type ca1, value_type ca2, value_type cb0, value_type cb1, value_type cb2)
+    constexpr Biquad() = default;
+    constexpr Biquad(value_type ca1, value_type ca2, value_type cb0, value_type cb1, value_type cb2)
             : a1{ca1}, a2{ca2}, b0{cb0}, b1{cb1}, b2{cb2} {}
 
     inline void process(buffer_type& buffer) noexcept {
@@ -42,8 +40,7 @@ public:
         }
     }
 
-    friend std::istream& operator>><buffer_type>(std::istream&, Filter&);
-    friend std::ostream& operator<<<buffer_type>(std::ostream&, Filter const&);
+    friend std::istream& operator>><buffer_type>(std::istream&, Biquad&);
 
 private:
     // TODO: Should coefficients always be doubles, or should they be scaled at construction time if integral?
@@ -54,13 +51,6 @@ private:
 template <typename BufferType>
 std::istream& operator>>(std::istream& is, Biquad<BufferType>& c) {
     return is >> c.a1 >> c.a2 >> c.b0 >> c.b1 >> c.b2;
-}
-template <typename BufferType>
-std::ostream& operator<<(std::ostream& os, Biquad<BufferType> const& filter) {
-    os << "Biquad: "
-       << "\na1: " << filter.a1 << "\na2: " << filter.a2 << "\nb0: " << filter.b0 << "\nb1: " << filter.b1
-       << "\nb2: " << filter.b2 << '\n';
-    return os;
 }
 
 } // namespace Audio
