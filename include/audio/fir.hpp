@@ -7,7 +7,6 @@
 #include <istream>
 #include <numeric>
 
-#include <audio/filter.hpp>
 #include <audio/circularIterator.hpp>
 
 namespace Audio {

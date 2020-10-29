@@ -5,8 +5,6 @@
 #include <istream>
 #include <utility>
 
-#include <audio/filter.hpp>
-
 namespace Audio {
 
 struct BiquadTag {};
