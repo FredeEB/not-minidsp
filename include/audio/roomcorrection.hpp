@@ -60,8 +60,6 @@ public:
     using filter_type = FIRFilter<typename system_traits::channel_type>;
     using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::type;
 
-    constexpr explicit RoomCorrection(){};
-
     void process(buffer_type& buffer) { filter.process(buffer); }
 
     void loadFiltersFromFile(std::string const& path) {
