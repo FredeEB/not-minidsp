@@ -19,8 +19,6 @@ int main(int argc, char** argv) {
 
     SystemTraits<float, 256, 2> traits;
 
-    auto& config = Util::getConfig();
-
     Passthrough<decltype(traits)> pt;
 
     ProcessingChain chain(traits, pt);
