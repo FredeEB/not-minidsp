@@ -25,7 +25,7 @@ public:
     using system_traits = SystemTraits;
     using buffer_type = typename system_traits::buffer_type;
     using filter_type = Biquad<typename system_traits::channel_type>;
-    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::type;
+    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::Type;
 
     void process(buffer_type& buffer) {
         for (auto& filter : filters) filter.process(buffer);
@@ -58,7 +58,7 @@ public:
     using value_type = typename system_traits::value_type;
     using buffer_type = typename system_traits::buffer_type;
     using filter_type = FIRFilter<typename system_traits::channel_type>;
-    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::type;
+    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::Type;
 
     void process(buffer_type& buffer) { filter.process(buffer); }
 
