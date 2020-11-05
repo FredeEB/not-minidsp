@@ -6,7 +6,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ### BINARY
 add_executable(fir-rc)
-add_executable(bypass)
 
 include_directories(include)
 
@@ -19,7 +18,6 @@ find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
 target_link_libraries(fir-rc PUBLIC Threads::Threads portaudio Boost::program_options compile_options)
-target_link_libraries(bypass PUBLIC Threads::Threads portaudio Boost::program_options compile_options)
 
 ### RUN BINARY TARGET (make run)
 add_custom_target(

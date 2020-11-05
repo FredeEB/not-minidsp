@@ -6,7 +6,7 @@
 namespace Util {
 
 struct Config {
-    std::string filterPath;
+    std::optional<std::string> filterPath;
     double sampleRate{48000.0};
     int deviceIndex;
 };

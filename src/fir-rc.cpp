@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     auto& config = Util::getConfig();
 
     RoomCorrection<decltype(traits), FIRTag> rc;
-    rc.loadFiltersFromFile(config.filterPath);
+    if (config.filterPath.has_value()) rc.loadFiltersFromFile(config.filterPath.value());
 
     ProcessingChain chain(traits, rc);
 
