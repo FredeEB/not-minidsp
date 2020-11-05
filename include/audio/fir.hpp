@@ -20,8 +20,9 @@ public:
     using value_type = typename buffer_type::value_type;
     using delayline_type = std::vector<value_type>;
 
-    constexpr FIRFilter() = default;
-    constexpr FIRFilter(delayline_type coeffs) : coefficients(std::move(coeffs)), delayline(coefficients.size()) {}
+    constexpr FIRFilter() noexcept = default;
+    constexpr FIRFilter(delayline_type coeffs) noexcept
+            : coefficients(std::move(coeffs)), delayline(coefficients.size()) {}
 
     inline void process(buffer_type& buffer) noexcept {
         std::transform(buffer.begin(), buffer.end(), buffer.begin(),
