@@ -7,6 +7,8 @@
 #include <audio/processortraits.hpp>
 #include <audio/processingchain.hpp>
 #include <audio/parallel.hpp>
+#include <audio/fft.hpp>
+#include <thread>
 
 using namespace Audio;
 
@@ -30,6 +32,7 @@ int main(int argc, char** argv) {
     processor.run();
 
     while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
     return 0;
