@@ -34,9 +34,9 @@ public:
     inline void run() {
         auto const deviceIndex = Util::getConfig().deviceIndex;
         PaDeviceInfo const* dev = Pa_GetDeviceInfo(deviceIndex);
-        if (dev->maxInputChannels < system_traits::channels)
+        if (dev->maxInputChannels < static_cast<int>(system_traits::channels))
             throw std::runtime_error("Device doesn't have anough input channels for requested configuration");
-        if (dev->maxOutputChannels < system_traits::channels)
+        if (dev->maxOutputChannels < static_cast<int>(system_traits::channels))
             throw std::runtime_error("Device doesn't have anough output channels for requested configuration");
 
         PaStreamParameters inparams = {deviceIndex, system_traits::channels,
