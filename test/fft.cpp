@@ -7,23 +7,22 @@
 
 TEST_CASE("Sanity") { REQUIRE(1 == 1); }
 
-TEST_CASE("FFT") {
-    SECTION("Forward fft, with peridoc signal") {
+TEST_CASE("Forward FFT") {
+    SECTION("with peridoc signal") {
         std::array input{
-#include "fft/periodicinput.txt"
+#include "fft/periodictime.txt"
         };
         std::array output{
-#include "fft/periodicoutput.txt"
+#include "fft/periodicfrequency.txt"
         };
 
-        Audio::FFT<float, 5> fft{};
-        auto fftdata = fft.createBuffer();
+        Audio::FFT<float, 32> fft{};
+        auto fftdatain = fft.createBuffer();
+        auto fftdataout = fft.createBuffer();
+        std::copy(input.begin(), input.end(), fftdatain.begin());
+        fft.apply(fftdatain.data(), fftdataout.data());
 
-        fft.apply(input.data(), fftdata.data());
-
-        // for (auto const v : fftdata) std::cout << v << std::endl;
-
-        std::transform(fftdata.begin(), fftdata.end(), output.begin(), output.begin(),
+        std::transform(fftdataout.begin(), fftdataout.end(), output.begin(), output.begin(),
                        [index = 0](auto const input, auto const output) mutable {
                            INFO("i=" << index++);
                            CHECK(input == output);
@@ -31,26 +30,72 @@ TEST_CASE("FFT") {
                        });
     }
 
-    SECTION("Forward fft, with weird signal") {
-        std::array<float, 16> input{
-#include "fft/weirdinput.txt"
+    SECTION("with weird signal") {
+        std::array input{
+#include "fft/weirdtime.txt"
         };
-        std::array<std::complex<float>, 16> output{
-#include "fft/weirdoutput.txt"
+        std::array output{
+#include "fft/weirdfrequency.txt"
         };
 
-        Audio::FFT<float, 4> fft{};
-        auto fftdata = fft.createBuffer();
+        Audio::FFT<float, 16> fft{};
+        auto fftdatain = fft.createBuffer();
+        auto fftdataout = fft.createBuffer();
+        std::copy(input.begin(), input.end(), fftdatain.begin());
+        fft.apply(fftdatain.data(), fftdataout.data());
 
-        fft.apply(input.data(), fftdata.data());
-
-        // for (auto const v : fftdata) std::cout << v << std::endl;
-
-        std::transform(fftdata.begin(), fftdata.end(), output.begin(), output.begin(),
-                       [index = 0](std::complex<float> const input, std::complex<float> const output) mutable {
+        std::transform(fftdataout.begin(), fftdataout.end(), output.begin(), output.begin(),
+                       [index = 0](auto const input, auto const output) mutable {
                            INFO("i=" << index++);
                            CHECK(input.real() == Approx(output.real()).epsilon(0.005));
                            CHECK(input.imag() == Approx(output.imag()).epsilon(0.005));
+                           return output;
+                       });
+    }
+}
+
+TEST_CASE("Inverse FFT") {
+    SECTION("with peridoc signal") {
+        std::array input{
+#include "fft/periodicfrequency.txt"
+        };
+        std::array output{
+#include "fft/periodictime.txt"
+        };
+
+        Audio::FFT<float, 32> fft{};
+        auto fftdatain = fft.createBuffer();
+        auto fftdataout = fft.createBuffer();
+        std::copy(input.begin(), input.end(), fftdatain.begin());
+        fft.inverse(fftdatain.data(), fftdataout.data());
+
+        std::transform(fftdataout.begin(), fftdataout.end(), output.begin(), output.begin(),
+                       [index = 0](auto const input, auto const output) mutable {
+                           INFO("i=" << index++);
+                           CHECK(input.real() == output);
+                           return output;
+                       });
+    }
+
+    SECTION("with weird signal") {
+        std::array input{
+#include "fft/weirdfrequency.txt"
+        };
+        std::array output{
+#include "fft/weirdtime.txt"
+        };
+
+        Audio::FFT<float, 16> fft{};
+        auto fftdatain = fft.createBuffer();
+        auto fftdataout = fft.createBuffer();
+        std::copy(input.begin(), input.end(), fftdatain.begin());
+        fft.inverse(fftdatain.data(), fftdataout.data());
+
+        std::transform(fftdataout.begin(), fftdataout.end(), output.begin(), output.begin(),
+                       [index = 0](auto const input, auto const output) mutable {
+                           INFO("i=" << index++);
+                           CHECK(input.real() == Approx(output).margin(0.005));
+                           CHECK(input.imag() == Approx(0).margin(0.005));
                            return output;
                        });
     }
