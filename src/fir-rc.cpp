@@ -18,11 +18,11 @@ int main(int argc, char** argv) {
 
     Util::parse_cli(argc, argv);
 
-    SystemTraits<float, 256, 2> traits;
+    SystemTraits<float, 1024, 2> traits;
 
     auto& config = Util::getConfig();
 
-    RoomCorrection<decltype(traits), FIRTag> rc;
+    RoomCorrection<decltype(traits), ConvolutionTag> rc;
     if (config.filterPath.has_value()) rc.loadFiltersFromFile(config.filterPath.value());
 
     ProcessingChain chain(traits, rc);
