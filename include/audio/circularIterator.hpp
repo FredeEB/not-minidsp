@@ -15,15 +15,15 @@ public:
             : begin(buffer.begin()), end(buffer.end()), p(offset) {}
 
     circular_iterator& operator++() {
-        if (p == end) p = begin;
         ++p;
+        if (p == end) p = begin;
         return *this;
     }
 
     circular_iterator operator++(int) {
-        if (p == end) p = begin;
         circular_iterator tmp(p);
         ++p;
+        if (p == end) p = begin;
         return tmp;
     }
 
