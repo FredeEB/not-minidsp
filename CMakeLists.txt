@@ -4,9 +4,10 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+enable_testing()
+
 ### BINARY
 add_executable(fir-rc)
-add_executable(bypass)
 
 include_directories(include)
 
@@ -19,7 +20,12 @@ find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
 target_link_libraries(fir-rc PUBLIC Threads::Threads portaudio Boost::program_options compile_options)
-target_link_libraries(bypass PUBLIC Threads::Threads portaudio Boost::program_options compile_options)
+
+option(BUILD_TESTING "Build unittests" OFF)
+
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif()
 
 ### RUN BINARY TARGET (make run)
 add_custom_target(

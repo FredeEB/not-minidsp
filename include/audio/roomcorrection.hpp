@@ -2,10 +2,8 @@
 #define ROOMCORRECTION_H
 
 #include <algorithm>
-#include <cstdint>
 #include <fstream>
 #include <iterator>
-#include <ostream>
 #include <utility>
 #include <vector>
 
@@ -13,6 +11,7 @@
 #include <audio/fir.hpp>
 #include <audio/parallel.hpp>
 #include <util/repeat_type.hpp>
+#include <audio/convolution.hpp>
 
 namespace Audio {
 
@@ -25,7 +24,7 @@ public:
     using system_traits = SystemTraits;
     using buffer_type = typename system_traits::buffer_type;
     using filter_type = Biquad<typename system_traits::channel_type>;
-    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::type;
+    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::Type;
 
     void process(buffer_type& buffer) {
         for (auto& filter : filters) filter.process(buffer);
@@ -58,9 +57,7 @@ public:
     using value_type = typename system_traits::value_type;
     using buffer_type = typename system_traits::buffer_type;
     using filter_type = FIRFilter<typename system_traits::channel_type>;
-    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::type;
-
-    constexpr explicit RoomCorrection(){};
+    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::Type;
 
     void process(buffer_type& buffer) { filter.process(buffer); }
 
@@ -69,6 +66,29 @@ public:
         std::istream_iterator<value_type> begin(file), end;
         std::vector<value_type> coeffs;
         std::copy(begin, end, std::back_inserter(coeffs));
+        filter = process_type(coeffs);
+    }
+
+private:
+    process_type filter{};
+};
+
+template <typename SystemTraits>
+class RoomCorrection<SystemTraits, ConvolutionTag> {
+public:
+    using system_traits = SystemTraits;
+    using value_type = typename system_traits::value_type;
+    using buffer_type = typename system_traits::buffer_type;
+    using filter_type = ConvolutionFilter<system_traits::channel_size, typename system_traits::channel_type>;
+    using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::Type;
+
+    void process(buffer_type& buffer) { filter.process(buffer); }
+
+    void loadFiltersFromFile(std::string const& path) {
+        std::ifstream file(path);
+        std::istream_iterator<value_type> begin(file), end;
+        typename filter_type::complex_buffer_type coeffs;
+        std::copy(begin, end, coeffs.begin());
         filter = process_type(coeffs);
     }
 

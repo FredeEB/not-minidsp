@@ -5,7 +5,7 @@
 
 namespace Audio {
 template <typename BufferType, typename Iter>
-class circular_iterator : public std::iterator<std::bidirectional_iterator_tag, BufferType> {
+class circular_iterator : public std::iterator<std::forward_iterator_tag, BufferType> {
 public:
     using value_type = typename BufferType::value_type;
     using perimeter_iterator = typename BufferType::iterator;
@@ -24,19 +24,6 @@ public:
         if (p == end) p = begin;
         circular_iterator tmp(p);
         ++p;
-        return tmp;
-    }
-
-    circular_iterator& operator--() {
-        if (p == std::prev(begin)) p = std::prev(end);
-        --p;
-        return *this;
-    }
-
-    circular_iterator operator--(int) {
-        if (p == std::prev(begin)) p = std::prev(end);
-        circular_iterator tmp(p);
-        --p;
         return tmp;
     }
 

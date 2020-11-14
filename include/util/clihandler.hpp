@@ -2,10 +2,12 @@
 #define CLIHANDLER_H
 
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 
 #include <portaudio.h>
 #include <boost/program_options.hpp>
+#include <filesystem>
 
 #include <util/config.hpp>
 #include <util/singleton.hpp>
@@ -24,8 +26,7 @@ void parse_cli(int const argc, char** argv) noexcept {
         cli.add_options()("help,h", "Show Help")("list-devices", "List connected devices");
 
         po::options_description algorithm("Algorithm Options");
-        algorithm.add_options()("file,f", po::value<std::string>()->default_value("filter.txt"),
-                                "path to file containing filter-coefficients");
+        algorithm.add_options()("file,f", po::value<std::string>(), "path to file containing filter-coefficients");
 
         auto const defaultDevice = Pa_GetDeviceCount() - 1;
 
@@ -54,7 +55,13 @@ void parse_cli(int const argc, char** argv) noexcept {
 
         auto& config = getConfig();
 
-        config.filterPath = vm["file"].as<std::string>();
+        if (auto filearg = vm.count("file"); filearg && std::filesystem::exists(vm["file"].as<std::string>()))
+            config.filterPath = vm["file"].as<std::string>();
+        else if (filearg)
+            throw std::runtime_error("Filterfile not found");
+        else
+            config.filterPath = {};
+
         config.sampleRate = vm["samplerate"].as<double>();
         config.deviceIndex = vm["device"].as<int>();
 

@@ -1,0 +1,17 @@
+std::complex<float>(-2.5, 0),
+std::complex<float>(-1.339, -1.175),
+std::complex<float>(1.111, -5.758),
+std::complex<float>(-32.321, 1.616),
+std::complex<float>(15, -22.5),
+std::complex<float>(-13.963, -6.869),
+std::complex<float>(8.889, 2.232),
+std::complex<float>(11.623, -9.66),
+std::complex<float>(8.5, 0),
+std::complex<float>(11.623, 9.66),
+std::complex<float>(8.889, -2.232),
+std::complex<float>(-13.963, 6.869),
+std::complex<float>(15, 22.5),
+std::complex<float>(-32.321, -1.616),
+std::complex<float>(1.111, 5.768),
+std::complex<float>(-1.339, 1.175)
+
