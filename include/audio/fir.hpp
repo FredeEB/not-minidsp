@@ -30,16 +30,17 @@ public:
     }
 
 private:
+	static_assert("NOT SUPPOTED IN C++14");
     inline value_type calculateSample(value_type value) noexcept {
-        *delaylinehead = value;
+        // *delaylinehead = value;
 
-        value_type res = std::transform_reduce(coefficients.begin(), coefficients.end(),
-                                               circular_iterator(delayline, delaylinehead), 0.0f);
+        // value_type res = std::transform_reduce(coefficients.begin(), coefficients.end(),
+        //                                        circular_iterator(delayline, delaylinehead), 0.0f);
 
-        if (delaylinehead == delayline.begin()) delaylinehead = delayline.end();
-        --delaylinehead;
+        // if (delaylinehead == delayline.begin()) delaylinehead = delayline.end();
+        // --delaylinehead;
 
-        return res;
+        // return res;
     }
 
     delayline_type coefficients;
