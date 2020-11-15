@@ -7,7 +7,7 @@
 
 #include <portaudio.h>
 #include <boost/program_options.hpp>
-#include <filesystem>
+#include <boost/filesystem.hpp>
 
 #include <util/config.hpp>
 #include <util/singleton.hpp>
@@ -55,7 +55,7 @@ void parse_cli(int const argc, char** argv) noexcept {
 
         auto& config = getConfig();
 
-        if (auto filearg = vm.count("file"); filearg && std::filesystem::exists(vm["file"].as<std::string>()))
+        if (auto filearg = vm.count("file"); filearg && boost::filesystem::exists(vm["file"].as<std::string>()))
             config.filterPath = vm["file"].as<std::string>();
         else if (filearg)
             throw std::runtime_error("Filterfile not found");

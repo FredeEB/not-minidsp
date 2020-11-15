@@ -1,5 +1,5 @@
 project(not-minidsp)
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -17,9 +17,9 @@ target_compile_options(compile_options INTERFACE -Wall -Wextra -Wshadow -Wnon-vi
 add_subdirectory(src)
 
 find_package(Threads REQUIRED)
-find_package(Boost COMPONENTS program_options REQUIRED)
+find_package(Boost COMPONENTS program_options filesystem REQUIRED)
 
-target_link_libraries(fir-rc PUBLIC Threads::Threads portaudio Boost::program_options compile_options)
+target_link_libraries(fir-rc PUBLIC Threads::Threads portaudio Boost::program_options Boost::filesystem compile_options sndfile)
 
 option(BUILD_TESTING "Build unittests" OFF)
 

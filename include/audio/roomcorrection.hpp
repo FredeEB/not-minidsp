@@ -15,7 +15,7 @@
 
 namespace Audio {
 
-template <typename SystemTraits, typename Tag = void>
+template <typename Tag, typename SystemTraits>
 class RoomCorrection;
 
 template <typename SystemTraits>
@@ -79,7 +79,7 @@ public:
     using system_traits = SystemTraits;
     using value_type = typename system_traits::value_type;
     using buffer_type = typename system_traits::buffer_type;
-    using filter_type = ConvolutionFilter<system_traits::channel_size, typename system_traits::channel_type>;
+    using filter_type = ConvolutionFilter<2048, typename system_traits::channel_type>;
     using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::Type;
 
     void process(buffer_type& buffer) { filter.process(buffer); }
@@ -87,7 +87,7 @@ public:
     void loadFiltersFromFile(std::string const& path) {
         std::ifstream file(path);
         std::istream_iterator<value_type> begin(file), end;
-        typename filter_type::complex_buffer_type coeffs;
+        typename filter_type::complex_buffer_type coeffs{};
         std::copy(begin, end, coeffs.begin());
         filter = process_type(coeffs);
     }
