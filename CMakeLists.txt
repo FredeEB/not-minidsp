@@ -19,7 +19,7 @@ add_subdirectory(src)
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS program_options filesystem REQUIRED)
 
-target_link_libraries(fir-rc PUBLIC Threads::Threads portaudio Boost::program_options Boost::filesystem compile_options sndfile)
+target_link_libraries(fir-rc PUBLIC Threads::Threads portaudio Boost::program_options Boost::filesystem compile_options)
 
 option(BUILD_TESTING "Build unittests" OFF)
 
