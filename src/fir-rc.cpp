@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
     Util::parse_cli(argc, argv);
 
-    SystemTraits<float, 1024, 2> traits;
+    SystemTraits<float, 2048, 2> traits;
 
     auto& config = Util::getConfig();
 
