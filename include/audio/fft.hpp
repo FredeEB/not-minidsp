@@ -6,9 +6,8 @@
 
 namespace Audio {
 
-template <typename ValueType, std::size_t N>
+template <typename ValueType, std::size_t Size>
 class FFT {
-    std::size_t static constexpr Size = N;
     FFT<ValueType, Size / 2> next;
 
     static constexpr std::complex<ValueType> imag{0.0f, 1.0f};
