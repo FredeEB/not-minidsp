@@ -18,8 +18,8 @@ public:
     complex_buffer_type static constexpr createBuffer() { return {}; }
 
     template <std::size_t Stride = 1>
-    void constexpr apply(typename complex_buffer_type::pointer __restrict const inbuffer,
-                         typename complex_buffer_type::pointer __restrict const outbuffer) {
+    void constexpr apply(typename complex_buffer_type::pointer inbuffer,
+                         typename complex_buffer_type::pointer outbuffer) {
         // Recursively call the Radix-2 DIT FFT
         next.template apply<2 * Stride>(inbuffer, outbuffer);
         next.template apply<2 * Stride>(inbuffer + Stride, outbuffer + Size / 2);
@@ -33,8 +33,8 @@ public:
         }
     }
     template <std::size_t Stride = 1>
-    void constexpr inverse(typename complex_buffer_type::pointer __restrict const inbuffer,
-                           typename complex_buffer_type::pointer __restrict const outbuffer) {
+    void constexpr inverse(typename complex_buffer_type::pointer inbuffer,
+                           typename complex_buffer_type::pointer outbuffer) {
         next.template inverse<2 * Stride>(inbuffer, outbuffer);
         next.template inverse<2 * Stride>(inbuffer + Stride, outbuffer + Size / 2);
 
@@ -54,13 +54,13 @@ public:
     using complex_buffer_type = std::array<std::complex<ValueType>, 1>;
     complex_buffer_type static constexpr createBuffer() { return {}; }
     template <std::size_t Stride>
-    auto constexpr apply(typename complex_buffer_type::pointer __restrict const inbuffer,
-                         typename complex_buffer_type::pointer __restrict const outbuffer) {
+    auto constexpr apply(typename complex_buffer_type::pointer inbuffer,
+                         typename complex_buffer_type::pointer outbuffer) {
         outbuffer[0] = inbuffer[0];
     }
     template <std::size_t Stride = 1>
-    auto constexpr inverse(typename complex_buffer_type::pointer __restrict const inbuffer,
-                           typename complex_buffer_type::pointer __restrict const outbuffer) {
+    auto constexpr inverse(typename complex_buffer_type::pointer inbuffer,
+                           typename complex_buffer_type::pointer outbuffer) {
         outbuffer[0] = inbuffer[0] / static_cast<ValueType>(Stride);
     }
 };
