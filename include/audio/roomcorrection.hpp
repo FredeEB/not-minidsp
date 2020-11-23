@@ -79,7 +79,8 @@ public:
     using system_traits = SystemTraits;
     using value_type = typename system_traits::value_type;
     using buffer_type = typename system_traits::buffer_type;
-    using filter_type = ConvolutionFilter<4096, typename system_traits::channel_type>;
+	// calibrated to raspberry pi
+    using filter_type = ConvolutionFilter<system_traits::channel_size * 2, typename system_traits::channel_type>;
     using process_type = typename Util::repeat_type<filter_type, system_traits::channels, Parallel>::Type;
 
     void process(buffer_type& buffer) { filter.process(buffer); }
