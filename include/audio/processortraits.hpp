@@ -2,6 +2,7 @@
 #define PROCESSORTRAITS_H
 
 #include <array>
+#include <type_traits>
 
 namespace Audio {
 
@@ -13,7 +14,7 @@ struct SystemTraits {
     static_assert(frame_size > 0, "Framesize can't be 0, both channels and channel_size has to be greater than 0");
     using value_type = ValueType;
     using channel_type = std::array<value_type, channel_size>;
-    using buffer_type = std::array<channel_type, channels>;
+    using buffer_type = std::conditional_t<channels == 1, channel_type, std::array<channel_type, channels>>;
 };
 
 } // namespace Audio
