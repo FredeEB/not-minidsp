@@ -7,10 +7,12 @@
 namespace Audio {
 
 template <typename ValueType, std::size_t Size>
-class FFT {
-    FFT<ValueType, Size / 2> next;
-
+class FFT : FFT<ValueType, Size / 2> {
+    // internal mixin
+    using Next = FFT<ValueType, Size / 2>;
+    // Imaginary unit: 0 + 1i
     static constexpr std::complex<ValueType> imag{0.0f, 1.0f};
+    // precomputed 2 * pi * i
     static const inline auto TWO_PI_I = 2 * M_PIf32 * imag;
 
 public:
@@ -21,8 +23,8 @@ public:
     void constexpr apply(typename complex_buffer_type::pointer inbuffer,
                          typename complex_buffer_type::pointer outbuffer) {
         // Recursively call the Radix-2 DIT FFT
-        next.template apply<2 * Stride>(inbuffer, outbuffer);
-        next.template apply<2 * Stride>(inbuffer + Stride, outbuffer + Size / 2);
+        Next::template apply<2 * Stride>(inbuffer, outbuffer);
+        Next::template apply<2 * Stride>(inbuffer + Stride, outbuffer + Size / 2);
 
         std::size_t k{};
         for (std::size_t i = 0; i < Size / 2; ++i) {
@@ -35,8 +37,8 @@ public:
     template <std::size_t Stride = 1>
     void constexpr inverse(typename complex_buffer_type::pointer inbuffer,
                            typename complex_buffer_type::pointer outbuffer) {
-        next.template inverse<2 * Stride>(inbuffer, outbuffer);
-        next.template inverse<2 * Stride>(inbuffer + Stride, outbuffer + Size / 2);
+        Next::template inverse<2 * Stride>(inbuffer, outbuffer);
+        Next::template inverse<2 * Stride>(inbuffer + Stride, outbuffer + Size / 2);
 
         std::size_t k{};
         for (std::size_t i = 0; i < Size / 2; ++i) {
