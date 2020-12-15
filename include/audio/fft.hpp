@@ -67,30 +67,6 @@ public:
     }
 };
 
-// template <std::size_t Size, std::size_t Stride = 1, std::size_t Start = 0, typename BufferType>
-// auto fft(BufferType& buffer) {
-//     using complex_value_type = typename BufferType::value_type;
-//     using value_type = typename complex_value_type::value_type;
-//     static constexpr typename BufferType::value_type imag{0.0f, 1.0f};
-//     static const auto TWO_PI_I = 2 * M_PIf32 * imag;
-
-//     if constexpr (Size == 1) {
-//         // basecase, buffer[Start] = buffer[Start] * (1 + 0i), ie no change
-//         return;
-//     } else {
-//         fft<Size / 2, Stride * 2, Start>(buffer);
-//         fft<Size / 2, Stride * 2, Start + Size / 2>(buffer);
-
-//         std::size_t k{};
-//         for (auto i = Start; i < Start + Size / 2; ++i) {
-//             auto const exp = std::exp(-TWO_PI_I * (static_cast<value_type>(k++) / Size));
-//             auto const temp = buffer[i];
-//             buffer[i] = temp + exp * buffer[i + Size];
-//             buffer[i + Stride] = temp - exp * buffer[i + Size];
-//         }
-//     }
-// }
-
 } // namespace Audio
 
 #endif /* FFT_H */
