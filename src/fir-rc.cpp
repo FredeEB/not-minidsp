@@ -9,13 +9,12 @@
 #include <audio/parallel.hpp>
 #include <audio/fft.hpp>
 #include <thread>
+#include <audio/convolution.hpp>
+#include <audio/processingchain.hpp>
 
 using namespace Audio;
 
 int main(int argc, char** argv) {
-    // initialize portaudio
-    AutoSystem sys;
-
     Util::parse_cli(argc, argv);
 
     SystemTraits<float, 2048, 2> traits;
@@ -23,9 +22,9 @@ int main(int argc, char** argv) {
     auto& config = Util::getConfig();
 
     RoomCorrection<decltype(traits), ConvolutionTag> rc;
-    if (config.filterPath.has_value()) rc.loadFiltersFromFile(config.filterPath.value());
 
     ProcessingChain chain(traits, rc);
+    if (config.filterPath.has_value()) chain.getAlgo<0>().loadFiltersFromFile(config.filterPath.value());
 
     AudioProcessor processor(chain);
 
