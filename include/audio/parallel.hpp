@@ -13,7 +13,7 @@ namespace Audio {
 template <typename... Algorithm>
 class Parallel {
 public:
-    using algorithm_type = std::tuple<Algorithm...>;
+    using process_type = std::tuple<Algorithm...>;
 
     template <typename... Args>
     constexpr Parallel(Args... args) noexcept : algorithms(Algorithm(args...)...) {}
@@ -34,7 +34,7 @@ private:
         (..., std::get<idx>(algorithms).process(std::get<idx>(buffer)));
     }
 
-    algorithm_type algorithms;
+    process_type algorithms;
 };
 
 template <typename Type, std::size_t Channels, typename... Args>

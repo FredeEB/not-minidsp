@@ -23,6 +23,9 @@ struct repeat_type<TypeName, 0, TypeList> {
     using Type = TypeList<>;
 };
 
+template <typename TypeName, std::size_t N, template <typename...> typename TypeList>
+using repeat_type_t = typename repeat_type<TypeName, N, TypeList>::Type;
+
 } // namespace Util
 
 #endif /* REPEAT_TYPE_H */
